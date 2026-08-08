@@ -24,6 +24,7 @@
   let selected = $state<string[]>([]);
   let placematEl: HTMLDivElement | undefined = $state();
   let summaryEl: HTMLDivElement | undefined = $state();
+  let orderBarEl: HTMLDivElement | undefined = $state();
   // Drives the mobile order bar: it hides only while the in-flow price
   // block is on screen, so price and controls are always reachable but
   // never doubled up
@@ -50,7 +51,6 @@
   const canvasLabel = $derived(
     `Your pizza so far: ${recipeSummary(selected).toLowerCase()}. Current price ${euroSpoken(price)}.`,
   );
-  const sizeCm = $derived(sizes.find((s) => s.id === size)?.cm ?? 32);
 
   $effect(() => {
     if (!summaryEl) return;
@@ -98,6 +98,7 @@
 
     selected = [...selected, slug];
     pulseCanvas();
+    pulseBar();
     announce(`${ingredient.name} added. Pizza price ${euroSpoken(priceAfter(selected))}.`);
 
     if (selected.length >= 10 && !lasagnaWarned) {
@@ -110,6 +111,7 @@
   function removeIngredient(slug: string) {
     const ingredient = ingredientBySlug.get(slug);
     selected = selected.filter((s) => s !== slug);
+    pulseBar();
     if (selected.length < 10) lasagnaWarned = false;
     if (ingredient) {
       announce(`${ingredient.name} removed. Pizza price ${euroSpoken(priceAfter(selected))}.`);
@@ -169,6 +171,21 @@
     placematEl.classList.remove('thud');
     void placematEl.offsetWidth; // restart the animation
     placematEl.classList.add('thud');
+  }
+
+  /* Same trick on the order bar: with the pizza scrolled far off-screen,
+     the bar's preview + price bump is the only visible "it landed" cue */
+  function pulseBar() {
+    if (!orderBarEl || prefersReducedMotion()) return;
+    orderBarEl.classList.remove('bump');
+    void orderBarEl.offsetWidth;
+    orderBarEl.classList.add('bump');
+  }
+
+  /* Tapping the bar's mini pizza jumps back to the real one; the global
+     scroll-behavior and scroll-padding-top handle smoothness + nav offset */
+  function scrollToPizza() {
+    placematEl?.scrollIntoView();
   }
 
   /* "Giovanni's choice": clears the pizza and deals 3–5 random toppings one
@@ -352,10 +369,21 @@
     <!-- Mobile order bar: fixed to the viewport bottom anywhere on the page
          once the pizza has toppings; hides only while the in-flow price
          block is on screen -->
-    <div class="order-bar" class:order-bar-hidden={summaryVisible || selected.length === 0}>
+    <div
+      class="order-bar"
+      class:order-bar-hidden={summaryVisible || selected.length === 0}
+      bind:this={orderBarEl}
+    >
+      <button type="button" class="order-bar-pizza" onclick={scrollToPizza}>
+        <span class="sr-only">Scroll back to your pizza</span>
+        <img src={BASE_LAYER_SRC} alt="" width="46" height="46" loading="lazy" />
+        {#each layers as layer (layer.slug)}
+          <img src={layer.layerSrc} alt="" width="46" height="46" loading="lazy" />
+        {/each}
+      </button>
       <div class="order-bar-info">
         <span class="order-bar-name">{pizzaName}</span>
-        <span class="order-bar-meta">{size} · {sizeCm} cm · {selected.length} topping{selected.length === 1 ? '' : 's'}</span>
+        <span class="order-bar-meta">{size} · {selected.length} topping{selected.length === 1 ? '' : 's'}</span>
       </div>
       <span class="order-bar-price">{euro(price)}</span>
       <button type="button" class="btn btn-primary order-bar-add" onclick={handleAddToOrder}>
@@ -689,6 +717,42 @@
     }
   }
 
+  /* Live mini replica of the canvas: the topping layers are full-canvas
+     scatter images, so simply stacking them at 46px reproduces the pizza */
+  .order-bar-pizza {
+    position: relative;
+    flex-shrink: 0;
+    width: 46px;
+    height: 46px;
+    padding: 0;
+    border: none;
+    background: none;
+    border-radius: 50%;
+    cursor: pointer;
+    filter: drop-shadow(1px 2px 0 rgba(33, 26, 18, 0.25));
+  }
+  .order-bar-pizza img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+  }
+  .order-bar-pizza:focus-visible {
+    outline: 3px solid var(--tomato);
+    outline-offset: 3px;
+  }
+
+  .order-bar:global(.bump) .order-bar-pizza,
+  .order-bar:global(.bump) .order-bar-price {
+    animation: bar-bump 0.35s ease;
+  }
+  @keyframes bar-bump {
+    40% {
+      transform: scale(1.15);
+    }
+  }
+
   .order-bar-info {
     display: grid;
     min-width: 0;
@@ -708,6 +772,8 @@
     font-weight: 600;
     color: var(--ink-soft);
     white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
   .order-bar-price {
     font-family: var(--font-display);
@@ -725,6 +791,20 @@
     }
     .order-bar {
       display: flex;
+    }
+  }
+
+  /* Tiny phones: the mini pizza already shows what's on the order, so the
+     text summary yields its space to the price and the Add button */
+  @media (max-width: 22.5rem) {
+    .order-bar {
+      gap: var(--space-2);
+    }
+    .order-bar-info {
+      display: none;
+    }
+    .order-bar-price {
+      margin-left: auto;
     }
   }
 
