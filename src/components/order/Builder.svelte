@@ -307,6 +307,9 @@
                   >
                     <span class="tray-icon" aria-hidden="true">
                       <img src={ingredient.iconSrc} alt="" width="34" height="34" loading="lazy" />
+                      {#if active}
+                        <span class="tray-icon-check">✓</span>
+                      {/if}
                     </span>
                     <span class="tray-name">
                       {ingredient.name}
@@ -319,9 +322,6 @@
                       <span class="sr-only">{tagNote(ingredient)}</span>
                     </span>
                     <span class="tray-price">+{euro(ingredient.price)}</span>
-                    <span class="tray-check" aria-hidden="true">
-                      {#if active}✓{/if}
-                    </span>
                   </button>
                 </li>
               {/each}
@@ -537,7 +537,10 @@
     margin: 0;
     padding: 0;
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(min(13.5rem, 100%), 1fr));
+    /* 16rem floor keeps pressed-state content (icon + name + price) from
+       ever clipping — phones get one comfortable column instead of two
+       cramped ones */
+    grid-template-columns: repeat(auto-fill, minmax(min(16rem, 100%), 1fr));
     gap: var(--space-2);
   }
   .tray-button {
@@ -575,6 +578,7 @@
   }
 
   .tray-icon {
+    position: relative;
     flex-shrink: 0;
     display: grid;
     place-items: center;
@@ -588,11 +592,31 @@
     background: var(--cream);
   }
 
+  /* Selection check rides the icon as a badge — costs no row width, so the
+     pressed state can never push the price out of the button */
+  .tray-icon-check {
+    position: absolute;
+    right: -7px;
+    bottom: -5px;
+    display: grid;
+    place-items: center;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--ink);
+    color: var(--cream);
+    font-size: 0.7rem;
+    font-weight: 800;
+    line-height: 1;
+  }
+
   .tray-name {
     display: inline-flex;
     align-items: center;
     gap: 0.3em;
     line-height: 1.15;
+    flex: 1;
+    min-width: 0;
   }
 
   .tray-price {
@@ -604,11 +628,6 @@
   }
   .tray-button[aria-pressed='true'] .tray-price {
     color: var(--paper-deep);
-  }
-
-  .tray-check {
-    width: 1em;
-    font-weight: 800;
   }
 
   @media (max-width: 56rem) {
