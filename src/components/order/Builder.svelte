@@ -537,7 +537,7 @@
     margin: 0;
     padding: 0;
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(13.5rem, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(min(13.5rem, 100%), 1fr));
     gap: var(--space-2);
   }
   .tray-button {

@@ -280,12 +280,14 @@
     right: 0;
     bottom: 0;
     z-index: 130;
-    width: min(28rem, 100vw);
+    width: min(28rem, 100%);
     display: flex;
     flex-direction: column;
     background: var(--paper);
     border-left: var(--border);
     padding: var(--space-4);
+    padding-bottom: calc(var(--space-4) + env(safe-area-inset-bottom));
+    padding-right: calc(var(--space-4) + env(safe-area-inset-right));
     overflow-y: auto;
   }
 

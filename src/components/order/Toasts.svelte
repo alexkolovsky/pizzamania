@@ -34,7 +34,7 @@
 <style>
   .toast-stack {
     position: fixed;
-    bottom: var(--space-3);
+    bottom: calc(var(--space-3) + env(safe-area-inset-bottom));
     left: 50%;
     transform: translateX(-50%);
     z-index: 140;
