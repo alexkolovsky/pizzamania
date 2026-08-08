@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 72 72" role="img" aria-label="pepperoni">
+
+    <g transform="translate(36 36) rotate(0)">
+      <circle r="23" fill="#8e2b1d"/>
+      <circle r="19.5" fill="#c2452f"/>
+      <circle r="14" fill="#d05a40"/>
+      <circle cx="-1.18" cy="-4.63" r="2.48" fill="#8e2b1d"/><circle cx="-1.64" cy="-7.09" r="1.94" fill="#8e2b1d"/><circle cx="-11.7" cy="12.3" r="1.84" fill="#8e2b1d"/><circle cx="-7.9" cy="11.3" r="2.41" fill="#8e2b1d"/><circle cx="5.56" cy="9.31" r="2.33" fill="#8e2b1d"/><circle cx="12.74" cy="-1.15" r="2.56" fill="#8e2b1d"/>
+      <circle cx="-2.73" cy="3.83" r="2.4" fill="#e8a08c"/>
+      <path d="M -13 -9 A 16 16 0 0 1 9 -13" fill="none" stroke="#e07a5f" stroke-width="3.5" stroke-linecap="round" opacity="0.8"/>
+    </g>
+</svg>

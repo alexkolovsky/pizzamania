@@ -1,0 +1,250 @@
+---
+// Menu cards are rendered statically from the pizza config; prices are
+// computed from the same ingredient data the builder uses.
+import { pizzas, pizzaPrice } from '../data/pizzas';
+import { BASE_LAYER_SRC, ingredientBySlug } from '../data/ingredients';
+import { euro } from '../lib/format';
+---
+
+<section id="menu" class="section menu-section" aria-labelledby="menu-heading">
+  <span class="ghost-word" aria-hidden="true">Le Pizze</span>
+  <div class="container">
+    <span class="section-kicker">Le nostre pizze</span>
+    <h2 id="menu-heading">The house five</h2>
+    <p class="menu-intro">
+      Five pizzas we will defend with our lives. Add one straight to your order, or hit
+      &ldquo;Customize&rdquo; and make it yours — Giovanni is watching, but he can't stop you.
+    </p>
+
+    <ul class="menu-grid" role="list">
+      {pizzas.map((pizza, index) => {
+        const toppings = pizza.ingredientSlugs
+          .map((slug) => ingredientBySlug.get(slug)!)
+          .sort((a, b) => a.z - b.z);
+        const names = toppings.map((t) => t.name).join(', ');
+        return (
+          <li class="menu-card">
+            <div class="menu-visual" aria-hidden="true">
+              <span class="menu-number">N°{index + 1}</span>
+              {index === 0 && <span class="menu-pick">Giovanni's pick ♥</span>}
+              <div class="menu-pizza">
+                <img src={BASE_LAYER_SRC} alt="" width="512" height="512" loading="lazy" />
+                {toppings.map((t) => (
+                  <img src={t.layerSrc} alt="" width="512" height="512" loading="lazy" style={`z-index:${t.z}`} />
+                ))}
+              </div>
+            </div>
+            <div class="menu-body">
+              <p class="menu-title-row">
+                <span class="menu-name">
+                  {pizza.name}
+                  {index === 0 && <span class="sr-only"> — Giovanni's pick</span>}
+                </span>
+                <span class="menu-dots" aria-hidden="true"></span>
+                <span class="menu-price">{euro(pizzaPrice(pizza.ingredientSlugs))}</span>
+              </p>
+              <p class="menu-desc">{pizza.description}</p>
+              <p class="menu-ingredients">Tomato, mozzarella, {names.toLowerCase()}</p>
+              <div class="menu-actions">
+                <button type="button" class="btn btn-primary" data-add-pizza={pizza.id}>
+                  Add to order<span class="sr-only">: {pizza.name}</span>
+                </button>
+                <button type="button" class="btn btn-secondary" data-customize-pizza={pizza.id}>
+                  Customize<span class="sr-only"> {pizza.name} in the builder</span>
+                </button>
+              </div>
+            </div>
+          </li>
+        );
+      })}
+    </ul>
+  </div>
+</section>
+
+<script>
+  import { addPizzaToCart, builderPreset } from '../stores/cart';
+  import { pizzaById } from '../data/pizzas';
+
+  document.querySelectorAll<HTMLButtonElement>('[data-add-pizza]').forEach((button) => {
+    button.addEventListener('click', () => addPizzaToCart(button.dataset.addPizza!));
+  });
+
+  document.querySelectorAll<HTMLButtonElement>('[data-customize-pizza]').forEach((button) => {
+    button.addEventListener('click', () => {
+      const pizza = pizzaById.get(button.dataset.customizePizza!);
+      if (!pizza) return;
+      builderPreset.set({ name: pizza.name, slugs: [...pizza.ingredientSlugs] });
+      const builder = document.getElementById('builder');
+      builder?.scrollIntoView({ block: 'start' });
+      // Move focus so keyboard/SR users land where the action is
+      builder?.focus({ preventScroll: true });
+    });
+  });
+</script>
+
+<style>
+  .menu-section {
+    position: relative;
+    overflow: clip;
+  }
+
+  /* Oversized outline word behind the section — pure decoration */
+  .ghost-word {
+    position: absolute;
+    top: 0.5rem;
+    right: -1rem;
+    z-index: 0;
+    font-family: var(--font-display);
+    font-size: clamp(5rem, 14vw, 12rem);
+    line-height: 1;
+    text-transform: uppercase;
+    white-space: nowrap;
+    color: transparent;
+    -webkit-text-stroke: 2px rgba(33, 26, 18, 0.14);
+    pointer-events: none;
+    user-select: none;
+  }
+  .menu-section .container {
+    position: relative;
+    z-index: 1;
+  }
+
+  .menu-pick {
+    position: absolute;
+    top: 0.6rem;
+    right: 0.75rem;
+    z-index: 70;
+    font-family: var(--font-display);
+    font-size: var(--text-sm);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--cream);
+    background: var(--tomato);
+    border: var(--border);
+    border-radius: 999px;
+    padding: 0.2em 0.7em;
+    transform: rotate(5deg);
+  }
+
+  .menu-intro {
+    max-width: 52ch;
+    color: var(--ink-soft);
+    margin-bottom: var(--space-5);
+  }
+
+  .menu-grid {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(18rem, 1fr));
+    gap: var(--space-4);
+  }
+
+  .menu-card {
+    display: flex;
+    flex-direction: column;
+    background: var(--cream);
+    border: var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-hard);
+    overflow: hidden;
+  }
+
+  .menu-visual {
+    position: relative;
+    aspect-ratio: 1.7;
+    background: var(--gingham);
+    border-bottom: var(--border);
+    overflow: hidden;
+  }
+  .menu-number {
+    position: absolute;
+    top: 0.6rem;
+    left: 0.75rem;
+    z-index: 70;
+    font-family: var(--font-display);
+    font-size: var(--text-lg);
+    color: var(--ink);
+    background: var(--mustard);
+    border: var(--border);
+    border-radius: 999px;
+    padding: 0.05em 0.55em;
+    transform: rotate(-6deg);
+  }
+  .menu-pizza {
+    position: absolute;
+    left: 50%;
+    top: 12%;
+    width: 72%;
+    aspect-ratio: 1;
+    transform: translateX(-50%) rotate(-3deg);
+    filter: drop-shadow(5px 7px 0 rgba(33, 26, 18, 0.2));
+  }
+  .menu-card:nth-child(even) .menu-pizza {
+    transform: translateX(-50%) rotate(3.5deg);
+  }
+  .menu-pizza img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  .menu-body {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    padding: var(--space-4);
+  }
+
+  /* Classic trattoria menu row: name … dotted leader … price */
+  .menu-title-row {
+    display: flex;
+    align-items: baseline;
+    gap: 0.6em;
+    margin-bottom: var(--space-2);
+  }
+  .menu-name {
+    font-family: var(--font-display);
+    text-transform: uppercase;
+    font-size: var(--text-xl);
+    line-height: 1.05;
+  }
+  .menu-dots {
+    flex: 1;
+    border-bottom: 3px dotted var(--ink-soft);
+    transform: translateY(-0.35em);
+    min-width: 1.5rem;
+  }
+  .menu-price {
+    font-family: var(--font-display);
+    font-size: var(--text-xl);
+    color: var(--tomato-ink);
+    white-space: nowrap;
+  }
+
+  .menu-desc {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-size: var(--text-lg);
+    line-height: 1.35;
+    color: var(--ink);
+    margin-bottom: var(--space-2);
+  }
+
+  .menu-ingredients {
+    font-size: var(--text-sm);
+    color: var(--ink-soft);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin: auto 0 var(--space-3);
+  }
+
+  .menu-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+</style>

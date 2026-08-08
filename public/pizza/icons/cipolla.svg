@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 72 72" role="img" aria-label="cipolla">
+
+    <g transform="translate(36 36) rotate(0)">
+      <circle r="20" fill="none" stroke="#a4548e" stroke-width="5" stroke-dasharray="82 44" stroke-linecap="round"/>
+      <circle r="13" fill="none" stroke="#c77bb2" stroke-width="3.5" opacity="0.9" stroke-dasharray="52 30" stroke-linecap="round"/>
+    </g>
+</svg>

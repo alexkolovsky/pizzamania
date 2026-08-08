@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 72 72" role="img" aria-label="funghi">
+
+    <g transform="translate(36 36) rotate(0)">
+      <path d="M -20 3 Q -20 -17 0 -17 Q 20 -17 20 3 L 12 3 L 12 -2 Q 12 -8 0 -8 Q -12 -8 -12 -2 L -12 3 Z" fill="#c8a06f" stroke="#7d5f3c" stroke-width="3" stroke-linejoin="round"/>
+      <path d="M -16 -3 Q -16 -12 0 -12 Q 16 -12 16 -3" fill="none" stroke="#a9885b" stroke-width="2.5" stroke-linecap="round"/>
+      <rect x="-5.5" y="-3" width="11" height="15" rx="4.5" fill="#e6d3ac" stroke="#7d5f3c" stroke-width="3"/>
+    </g>
+</svg>

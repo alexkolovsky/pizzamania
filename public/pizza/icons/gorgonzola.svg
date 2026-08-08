@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 72 72" role="img" aria-label="gorgonzola">
+
+    <g transform="translate(36 36) rotate(0)">
+      <path d="M 13.07 0 Q 13.07 0 11.75 5.21 Q 10.42 10.42 5.21 14.71 Q 0 19.01 -5.52 15.02 Q -11.04 11.04 -11.92 5.52 Q -12.79 0 -12.51 -6.12 Q -12.24 -12.24 -6.12 -13.5 Q 0 -14.75 4.31 -11.69 Q 8.62 -8.62 10.85 -4.31 Z" fill="#efe7ce"/>
+      <path d="M -6 -4 Q -2 -1 -5 3 M 4 -6 Q 6 -2 3 1 M -1 5 Q 2 7 5 5" fill="none" stroke="#67819b" stroke-width="2.2" stroke-linecap="round"/>
+      <circle cx="-4" cy="6" r="1.4" fill="#7b93ab"/>
+      <circle cx="7" cy="-1" r="1.2" fill="#67819b"/>
+    </g>
+</svg>

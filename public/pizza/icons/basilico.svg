@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 72 72" role="img" aria-label="basilico">
+
+    <g transform="translate(36 36) rotate(0)">
+      <path d="M 0 -21 Q 15 -10 13 6 Q 11 17 0 21 Q -11 17 -13 6 Q -15 -10 0 -21 Z" fill="#3f6b33" stroke="#2c4e22" stroke-width="1.5"/>
+      <path d="M 0 -21 Q 15 -10 13 6 Q 11 17 0 21 L 0 -21 Z" fill="#4d7d3e"/>
+      <path d="M 0 -14 L 0 16 M 0 -5 Q 7 -7 9.5 -2 M 0 3 Q -7 1 -8.5 6 M 0 -10 Q 4.5 -11 6.5 -8" fill="none" stroke="#6f965c" stroke-width="2" stroke-linecap="round"/>
+    </g>
+</svg>

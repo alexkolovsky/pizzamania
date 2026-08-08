@@ -1,0 +1,55 @@
+---
+// Big-number USP strip between menu and builder — the facts behind the copy.
+const stats = [
+  { value: '450°', label: 'in the wood-fired oven' },
+  { value: '90 sec', label: 'from raw to blistered' },
+  { value: '48 h', label: 'of dough patience' },
+  { value: '15', label: 'toppings, one opinion each' },
+];
+---
+
+<section class="stats" aria-label="Pizzeria facts">
+  <div class="container stats-grid">
+    {stats.map((stat) => (
+      <div class="stat">
+        <span class="stat-value">{stat.value}</span>
+        <span class="stat-label">{stat.label}</span>
+      </div>
+    ))}
+  </div>
+</section>
+
+<style>
+  .stats {
+    background: var(--ink);
+    color: var(--paper);
+    border-top: var(--border);
+    padding-block: var(--space-4);
+  }
+
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+    gap: var(--space-4);
+    text-align: center;
+  }
+
+  .stat {
+    display: grid;
+    gap: 0.15rem;
+  }
+
+  .stat-value {
+    font-family: var(--font-display);
+    font-size: var(--text-2xl);
+    line-height: 1;
+    color: var(--mustard);
+  }
+
+  .stat-label {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-size: var(--text-base);
+    color: var(--paper);
+  }
+</style>

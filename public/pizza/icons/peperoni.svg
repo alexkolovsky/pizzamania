@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 72 72" role="img" aria-label="peperoni">
+
+    <g transform="translate(36 36) rotate(-18)">
+      <path d="M -26 6 Q -8 -14 26 -6 Q 29 0 25 5 Q -5 -3 -21 13 Q -28 12 -26 6 Z" fill="#e0a63c"/>
+      <path d="M -24 8 Q -6 -8 25 0" fill="none" stroke="#c08a28" stroke-width="3" stroke-linecap="round"/>
+      <path d="M -18 3 Q -4 -7 16 -3" fill="none" stroke="#f2c76e" stroke-width="2.5" stroke-linecap="round" opacity="0.9"/>
+    </g>
+</svg>

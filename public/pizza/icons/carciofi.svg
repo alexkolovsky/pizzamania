@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 72 72" role="img" aria-label="carciofi">
+
+    <g transform="translate(36 36) rotate(0)">
+      <path d="M 0 -24 Q 15 -12 13 6 Q 11 20 0 24 Q -11 20 -13 6 Q -15 -12 0 -24 Z" fill="#7e9e5a"/>
+      <path d="M 0 -17 Q 10 -8 9 6 Q 7 15 0 18 Q -7 15 -9 6 Q -10 -8 0 -17 Z" fill="#9bb877"/>
+      <path d="M 0 -9 Q 5 -3 4 7 Q 3 12 0 14 Q -3 12 -4 7 Q -5 -3 0 -9 Z" fill="#c9d9a8"/>
+      <path d="M 0 -13 L 0 15 M -6 -4 Q -3 4 0 8 M 6 -4 Q 3 4 0 8" fill="none" stroke="#617e42" stroke-width="2.2" stroke-linecap="round"/>
+    </g>
+</svg>

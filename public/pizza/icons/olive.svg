@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 72 72" role="img" aria-label="olive">
+
+    <g transform="translate(36 36) rotate(0)">
+      <circle r="11" fill="#35332a"/>
+      <circle r="4.5" fill="#6b675a"/>
+      <circle cx="-3.5" cy="-4" r="2.4" fill="#57544a"/>
+      <circle cx="4" cy="3" r="1.5" fill="#4a4738"/>
+    </g>
+</svg>

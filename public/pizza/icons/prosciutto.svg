@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 72 72" role="img" aria-label="prosciutto">
+
+    <g transform="translate(36 36) rotate(0)">
+      <path d="M -32 -10 Q -12 -27 10 -17 Q 34 -8 28 10 Q 10 27 -14 18 Q -36 8 -32 -10 Z" fill="#de8f92"/>
+      <path d="M -24 -6 Q -6 -18 12 -10 Q 25 -4 20 8 Q 5 18 -11 11 Q -26 4 -24 -6 Z" fill="#f0b3ae"/>
+      <path d="M -18 2 Q -2 -8 14 -1 M -14 8 Q 0 1 12 6" fill="none" stroke="#f9dcd4" stroke-width="3" stroke-linecap="round"/>
+      <path d="M -32 -10 Q -12 -27 10 -17 Q 34 -8 28 10" fill="none" stroke="#c97377" stroke-width="2.5" stroke-linecap="round" opacity="0.8"/>
+    </g>
+</svg>

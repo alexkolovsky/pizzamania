@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="cipolla layer">
+
+    <g transform="translate(273.55 278.11) rotate(190.59)">
+      <circle r="20" fill="none" stroke="#a4548e" stroke-width="5" stroke-dasharray="82 44" stroke-linecap="round"/>
+      <circle r="13" fill="none" stroke="#c77bb2" stroke-width="3.5" opacity="0.9" stroke-dasharray="52 30" stroke-linecap="round"/>
+    </g>
+
+    <g transform="translate(221.51 284.37) rotate(267.99)">
+      <circle r="20" fill="none" stroke="#a4548e" stroke-width="5"/>
+      <circle r="13" fill="none" stroke="#c77bb2" stroke-width="3.5" opacity="0.9"/>
+    </g>
+
+    <g transform="translate(263.5 197.17) rotate(316.67)">
+      <circle r="20" fill="none" stroke="#a4548e" stroke-width="5"/>
+      <circle r="13" fill="none" stroke="#c77bb2" stroke-width="3.5" opacity="0.9"/>
+    </g>
+
+    <g transform="translate(290.98 322.66) rotate(307.12)">
+      <circle r="20" fill="none" stroke="#a4548e" stroke-width="5"/>
+      <circle r="13" fill="none" stroke="#c77bb2" stroke-width="3.5" opacity="0.9"/>
+    </g>
+
+    <g transform="translate(213.02 186.56) rotate(164.23)">
+      <circle r="20" fill="none" stroke="#a4548e" stroke-width="5"/>
+      <circle r="13" fill="none" stroke="#c77bb2" stroke-width="3.5" opacity="0.9"/>
+    </g>
+
+    <g transform="translate(348.17 225.32) rotate(249.41)">
+      <circle r="20" fill="none" stroke="#a4548e" stroke-width="5"/>
+      <circle r="13" fill="none" stroke="#c77bb2" stroke-width="3.5" opacity="0.9"/>
+    </g>
+
+    <g transform="translate(164.78 329.51) rotate(85.91)">
+      <circle r="20" fill="none" stroke="#a4548e" stroke-width="5"/>
+      <circle r="13" fill="none" stroke="#c77bb2" stroke-width="3.5" opacity="0.9"/>
+    </g>
+
+    <g transform="translate(204.17 142.18) rotate(139.7)">
+      <circle r="20" fill="none" stroke="#a4548e" stroke-width="5"/>
+      <circle r="13" fill="none" stroke="#c77bb2" stroke-width="3.5" opacity="0.9"/>
+    </g>
+
+    <g transform="translate(330.37 353.06) rotate(294.9)">
+      <circle r="20" fill="none" stroke="#a4548e" stroke-width="5"/>
+      <circle r="13" fill="none" stroke="#c77bb2" stroke-width="3.5" opacity="0.9"/>
+    </g>
+
+    <g transform="translate(125.9 227.32) rotate(357.37)">
+      <circle r="20" fill="none" stroke="#a4548e" stroke-width="5"/>
+      <circle r="13" fill="none" stroke="#c77bb2" stroke-width="3.5" opacity="0.9"/>
+    </g>
+
+    <g transform="translate(341.73 146.32) rotate(82.59)">
+      <circle r="20" fill="none" stroke="#a4548e" stroke-width="5" stroke-dasharray="82 44" stroke-linecap="round"/>
+      <circle r="13" fill="none" stroke="#c77bb2" stroke-width="3.5" opacity="0.9" stroke-dasharray="52 30" stroke-linecap="round"/>
+    </g>
+</svg>

@@ -1,0 +1,26 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Nav from '../components/Nav.astro';
+import Hero from '../components/Hero.astro';
+import Menu from '../components/Menu.astro';
+import StatsBand from '../components/StatsBand.astro';
+import Story from '../components/Story.astro';
+import Footer from '../components/Footer.astro';
+import OrderApp from '../components/order/OrderApp.svelte';
+---
+
+<Layout
+  title="Pizza Mania — wood-fired Neapolitan pizza, built your way"
+  description="Neapolitan pizzeria with a build-your-own pizza workshop, five house classics, and a chef with very strong opinions about pineapple."
+>
+  <Nav />
+  <main id="main">
+    <Hero />
+    <Menu />
+    <StatsBand />
+    <!-- client:load — the cart panel must react to the nav button immediately -->
+    <OrderApp client:load />
+    <Story />
+  </main>
+  <Footer />
+</Layout>
