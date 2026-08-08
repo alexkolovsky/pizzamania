@@ -23,6 +23,10 @@
 
   let selected = $state<string[]>([]);
   let placematEl: HTMLDivElement | undefined = $state();
+  let actionsEl: HTMLDivElement | undefined = $state();
+  // Drives the mobile sticky order bar: hidden while the in-flow summary
+  // (canvas column actions) is already on screen, so controls never double up
+  let summaryVisible = $state(true);
   let size = $state<SizeId>('M');
   let giovanniActive = $state(false);
   // One lasagna joke per crossing of the 10-topping line, not per topping after it
@@ -45,6 +49,17 @@
   const canvasLabel = $derived(
     `Your pizza so far: ${recipeSummary(selected).toLowerCase()}. Current price ${euroSpoken(price)}.`,
   );
+  const sizeCm = $derived(sizes.find((s) => s.id === size)?.cm ?? 32);
+
+  $effect(() => {
+    if (!actionsEl) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => (summaryVisible = entry?.isIntersecting ?? false),
+      { rootMargin: '0px 0px -56px 0px' },
+    );
+    observer.observe(actionsEl);
+    return () => observer.disconnect();
+  });
 
   // "Customize" on a menu card pushes a recipe into this atom
   $effect(() =>
@@ -264,7 +279,7 @@
             </ul>
           {/if}
 
-          <div class="builder-actions">
+          <div class="builder-actions" bind:this={actionsEl}>
             <button type="button" class="btn btn-primary" onclick={handleAddToOrder}>
               Add to order
             </button>
@@ -329,6 +344,19 @@
           </div>
         {/each}
       </div>
+    </div>
+
+    <!-- Mobile sticky order bar: sticks to the viewport bottom while the
+         tray is scrolled, hides whenever the real summary is on screen -->
+    <div class="order-bar" class:order-bar-hidden={summaryVisible}>
+      <div class="order-bar-info">
+        <span class="order-bar-name">{pizzaName}</span>
+        <span class="order-bar-meta">{size} · {sizeCm} cm · {selected.length} topping{selected.length === 1 ? '' : 's'}</span>
+      </div>
+      <span class="order-bar-price">{euro(price)}</span>
+      <button type="button" class="btn btn-primary order-bar-add" onclick={handleAddToOrder}>
+        Add<span class="sr-only"> {pizzaName} to order</span>
+      </button>
     </div>
   </div>
 </section>
@@ -630,9 +658,77 @@
     color: var(--paper-deep);
   }
 
+  /* ---- Sticky order bar (stacked layout only) ---- */
+  .order-bar {
+    position: sticky;
+    bottom: calc(var(--space-2) + env(safe-area-inset-bottom));
+    z-index: 90;
+    display: none;
+    align-items: center;
+    gap: var(--space-3);
+    margin-top: var(--space-4);
+    padding: var(--space-2) var(--space-3);
+    background: var(--cream);
+    border: var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-hard);
+    transition: transform 0.25s ease, opacity 0.25s ease, visibility 0.25s;
+  }
+  .order-bar-hidden {
+    visibility: hidden; /* also removes the duplicate button from tab order */
+    opacity: 0;
+    transform: translateY(140%);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .order-bar {
+      transition: none;
+    }
+  }
+
+  .order-bar-info {
+    display: grid;
+    min-width: 0;
+    flex: 1;
+  }
+  .order-bar-name {
+    font-family: var(--font-display);
+    text-transform: uppercase;
+    font-size: var(--text-base);
+    line-height: 1.15;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .order-bar-meta {
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: var(--ink-soft);
+    white-space: nowrap;
+  }
+  .order-bar-price {
+    font-family: var(--font-display);
+    font-size: var(--text-lg);
+    color: var(--tomato-ink);
+    white-space: nowrap;
+  }
+  .order-bar-add {
+    flex-shrink: 0;
+  }
+
   @media (max-width: 56rem) {
     .builder-grid {
       grid-template-columns: 1fr;
+    }
+    .order-bar {
+      display: flex;
+    }
+  }
+
+  /* Two-column layout: pin the pizza + summary beside the scrolling tray */
+  @media (min-width: 56.01rem) {
+    .canvas-column {
+      position: sticky;
+      top: calc(var(--nav-height) + var(--space-3));
     }
   }
 </style>
