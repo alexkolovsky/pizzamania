@@ -22,6 +22,11 @@ import { euro } from '../lib/format';
           .map((slug) => ingredientBySlug.get(slug)!)
           .sort((a, b) => a.z - b.z);
         const names = toppings.map((t) => t.name).join(', ');
+        // Base is tomato + mozzarella, so "vegetarian" hinges on the toppings
+        const isVegetarian = toppings.every(
+          (t) => t.tags.includes('vegetarian') || t.tags.includes('vegan'),
+        );
+        const isSpicy = toppings.some((t) => t.tags.includes('spicy'));
         return (
           <li class="menu-card">
             <div class="menu-visual" aria-hidden="true">
@@ -45,6 +50,22 @@ import { euro } from '../lib/format';
               </p>
               <p class="menu-desc">{pizza.description}</p>
               <p class="menu-ingredients">Tomato, mozzarella, {names.toLowerCase()}</p>
+              {(isVegetarian || isSpicy) && (
+                <p class="menu-tags">
+                  {isVegetarian && (
+                    <span class="menu-tag menu-tag-veg">
+                      <svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true"><path d="M13 3 Q13 11 6 13 Q3 13 3 10 Q3 5 13 3 Z M6 13 Q8 8 12 5" fill="#3a5a2e" stroke="#f6eedf" stroke-width="0.8"/></svg>
+                      Vegetariana
+                    </span>
+                  )}
+                  {isSpicy && (
+                    <span class="menu-tag menu-tag-spicy">
+                      <svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true"><path d="M11 2 Q13 2 13 4 Q13 5 12 5.5 Q13 10 8 13 Q3 15 2 11 Q6 12 8 9 Q10 6.5 10 5.5 Q9 5 9 4 Q9 2 11 2 Z" fill="#a82f16"/></svg>
+                      Piccante
+                    </span>
+                  )}
+                </p>
+              )}
               <div class="menu-actions">
                 <button type="button" class="btn btn-primary" data-add-pizza={pizza.id}>
                   Add to order<span class="sr-only">: {pizza.name}</span>
@@ -241,6 +262,34 @@ import { euro } from '../lib/format';
     text-transform: uppercase;
     letter-spacing: 0.05em;
     margin: auto 0 var(--space-3);
+  }
+  /* Tighter gap when the tag chips follow */
+  .menu-ingredients:has(+ .menu-tags) {
+    margin-bottom: var(--space-2);
+  }
+
+  .menu-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-1);
+    margin: 0 0 var(--space-3);
+  }
+  .menu-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35em;
+    padding: 0.15em 0.6em;
+    border: 1.5px solid var(--ink);
+    border-radius: 999px;
+    background: var(--paper);
+    font-size: var(--text-sm);
+    font-weight: 700;
+  }
+  .menu-tag-veg {
+    color: var(--basil);
+  }
+  .menu-tag-spicy {
+    color: var(--tomato-ink);
   }
 
   .menu-actions {

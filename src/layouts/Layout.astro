@@ -7,6 +7,32 @@ interface Props {
 }
 
 const { title, description } = Astro.props;
+
+// Restaurant schema for search engines and AI assistants; the numbers match
+// the hours in the footer and the rating shown in the hero/reviews.
+const schema = {
+  '@context': 'https://schema.org',
+  '@type': 'Restaurant',
+  name: 'Pizza Mania',
+  description,
+  servesCuisine: 'Neapolitan pizza',
+  priceRange: '€',
+  telephone: '+39 081 000 0000',
+  address: {
+    '@type': 'PostalAddress',
+    streetAddress: 'Vico della Mozzarella 17',
+    postalCode: '80134',
+    addressLocality: 'Napoli',
+    addressCountry: 'IT',
+  },
+  openingHours: ['Tu-Su 12:00-15:00', 'Tu-Su 18:00-23:30'],
+  aggregateRating: {
+    '@type': 'AggregateRating',
+    ratingValue: '4.9',
+    reviewCount: '812',
+  },
+  acceptsReservations: false,
+};
 ---
 
 <!doctype html>
@@ -31,6 +57,7 @@ const { title, description } = Astro.props;
       crossorigin
     />
     <title>{title}</title>
+    <script is:inline type="application/ld+json" set:html={JSON.stringify(schema)} />
   </head>
   <body>
     <a href="#main" class="skip-link">Skip to content</a>

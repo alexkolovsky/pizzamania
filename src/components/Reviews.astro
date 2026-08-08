@@ -1,0 +1,126 @@
+---
+// Social proof between the builder and the story: three short reviews and
+// an aggregate line. Static copy, same trattoria art direction as the menu.
+const reviews = [
+  {
+    quote: 'The margherita made me call my nonna to apologize. For what? Everything.',
+    name: 'Lucia R.',
+    place: 'Napoli',
+  },
+  {
+    quote:
+      'I ordered pineapple. Giovanni allowed it. I felt judged, fed and forgiven — in that order.',
+    name: 'Marek D.',
+    place: 'Wien',
+  },
+  {
+    quote: '48-hour dough, 90-second bake, gone in 40 seconds. The math checks out.',
+    name: 'Sofia T.',
+    place: 'Milano',
+  },
+];
+---
+
+<section class="section reviews" aria-labelledby="reviews-heading">
+  <div class="container">
+    <span class="section-kicker">Parola di cliente</span>
+    <h2 id="reviews-heading">Word on the vicolo</h2>
+    <p class="reviews-aggregate">
+      <span class="reviews-stars" aria-hidden="true">★★★★★</span>
+      <span class="sr-only">Rated 4.9 out of 5.</span>
+      <strong>4.9 / 5</strong> from 812 orders that arrived warm.
+    </p>
+
+    <ul class="reviews-grid" role="list">
+      {reviews.map((review) => (
+        <li class="review-card">
+          <p class="review-stars" aria-hidden="true">★★★★★</p>
+          <span class="sr-only">Five stars.</span>
+          <blockquote class="review-quote">
+            <p>&ldquo;{review.quote}&rdquo;</p>
+          </blockquote>
+          <p class="review-byline">
+            {review.name} <span class="review-place">· {review.place}</span>
+          </p>
+        </li>
+      ))}
+    </ul>
+  </div>
+</section>
+
+<style>
+  .reviews {
+    border-top: var(--border);
+  }
+
+  .reviews-aggregate {
+    font-size: var(--text-lg);
+    font-weight: 600;
+    color: var(--ink-soft);
+    margin-bottom: var(--space-5);
+  }
+  .reviews-stars,
+  .review-stars {
+    color: var(--mustard);
+    letter-spacing: 0.1em;
+    margin-right: 0.35em;
+    text-shadow: 1px 1px 0 var(--ink);
+  }
+  .reviews-aggregate strong {
+    color: var(--ink);
+  }
+
+  .reviews-grid {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(16rem, 100%), 1fr));
+    gap: var(--space-4);
+  }
+
+  .review-card {
+    display: flex;
+    flex-direction: column;
+    background: var(--cream);
+    border: var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-hard);
+    padding: var(--space-4);
+    transform: rotate(-0.6deg);
+  }
+  .review-card:nth-child(2) {
+    transform: rotate(0.7deg);
+  }
+  .review-card:nth-child(3) {
+    transform: rotate(-0.4deg);
+  }
+
+  .review-stars {
+    font-size: var(--text-base);
+    margin-bottom: var(--space-2);
+  }
+
+  .review-quote {
+    margin: 0 0 var(--space-3);
+    flex: 1;
+  }
+  .review-quote p {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-size: var(--text-lg);
+    line-height: 1.4;
+    margin: 0;
+  }
+
+  .review-byline {
+    font-weight: 700;
+    font-size: var(--text-sm);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin: 0;
+  }
+  .review-place {
+    color: var(--ink-soft);
+  }
+</style>

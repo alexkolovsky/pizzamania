@@ -3,6 +3,9 @@
   import {
     cartItems,
     cartTotal,
+    deliveryFee,
+    orderTotal,
+    FREE_DELIVERY_MIN,
     isCartOpen,
     setQty,
     removeFromCart,
@@ -43,6 +46,7 @@
   let errors = $state<Partial<Record<FieldId, string>>>({});
   let orderedName = $state('');
   let orderedPlace = $state('');
+  let orderedTotal = $state(0);
 
   let orderButton: HTMLButtonElement | undefined = $state();
 
@@ -147,9 +151,10 @@
     if (!validate()) return;
     orderedName = form.name.trim();
     orderedPlace = `${form.street.trim()}, ${form.city.trim()}`;
+    orderedTotal = $orderTotal;
     stage = 'success';
     announce(
-      `Order placed for ${orderedName}. Total ${euroSpoken($cartTotal)}. Grazie! Your pizza is in the fictional oven.`,
+      `Order placed for ${orderedName}. Total ${euroSpoken(orderedTotal)}. Grazie! Your pizza is in the fictional oven.`,
     );
     clearCart();
     // Details stay in the form (and in storage) so the next order is prefilled
@@ -236,10 +241,27 @@
           {/each}
         </ul>
         <footer class="panel-footer">
-          <p class="total">
-            <span>Total</span>
-            <strong>{euro($cartTotal)}</strong>
-          </p>
+          <dl class="summary">
+            <div class="summary-row">
+              <dt>Subtotal</dt>
+              <dd>{euro($cartTotal)}</dd>
+            </div>
+            <div class="summary-row">
+              <dt>Delivery</dt>
+              <dd>
+                {#if $deliveryFee === 0}<span class="summary-free">Free</span>{:else}{euro($deliveryFee)}{/if}
+              </dd>
+            </div>
+            <div class="summary-row summary-total">
+              <dt>Total</dt>
+              <dd>{euro($orderTotal)}</dd>
+            </div>
+          </dl>
+          {#if $deliveryFee > 0}
+            <p class="free-nudge">
+              Add {euro(FREE_DELIVERY_MIN - $cartTotal)} more and delivery is on the house.
+            </p>
+          {/if}
           <button type="button" class="btn btn-primary checkout-button" onclick={() => (stage = 'checkout')}>
             Go to checkout
           </button>
@@ -247,9 +269,27 @@
       {/if}
     {:else if stage === 'checkout'}
       <form class="checkout" onsubmit={submitOrder} novalidate>
+        <dl class="summary checkout-summary">
+          <div class="summary-row">
+            <dt>
+              {$cartItems.reduce((n, i) => n + i.qty, 0)}
+              pizza{$cartItems.reduce((n, i) => n + i.qty, 0) === 1 ? '' : 's'}
+            </dt>
+            <dd>{euro($cartTotal)}</dd>
+          </div>
+          <div class="summary-row">
+            <dt>Delivery</dt>
+            <dd>
+              {#if $deliveryFee === 0}<span class="summary-free">Free</span>{:else}{euro($deliveryFee)}{/if}
+            </dd>
+          </div>
+          <div class="summary-row summary-total">
+            <dt>Total</dt>
+            <dd>{euro($orderTotal)}</dd>
+          </div>
+        </dl>
         <p class="checkout-note">
-          {$cartItems.reduce((n, i) => n + i.qty, 0)} pizza{$cartItems.reduce((n, i) => n + i.qty, 0) === 1 ? '' : 's'},
-          {euro($cartTotal)} — cash on delivery, smiles included.
+          Cash on delivery, smiles included. Vespa ETA: 30–45 minutes.
         </p>
 
         <div class="field">
@@ -372,6 +412,7 @@
           already arguing with traffic on the way to {orderedPlace}. We'll call before ringing.
           Estimated delivery: one daydream.
         </p>
+        <p class="success-total">Have {euro(orderedTotal)} ready — cash on delivery.</p>
         <button type="button" class="btn btn-primary" onclick={close}>Perfetto</button>
       </div>
     {/if}
@@ -546,27 +587,68 @@
     border-top: var(--border);
     padding-top: var(--space-3);
   }
-  .total {
+  /* Order summary: trattoria-menu rows with dotted leaders. Used on both
+     the cart footer and the checkout, so no cost is a surprise later. */
+  .summary {
+    display: grid;
+    gap: 0.4rem;
+    margin: 0 0 var(--space-3);
+  }
+  .summary-row {
     display: flex;
     align-items: baseline;
     gap: 0.6em;
-    font-family: var(--font-display);
-    text-transform: uppercase;
-    font-size: var(--text-lg);
-    margin-bottom: var(--space-3);
+    font-weight: 600;
   }
-  .total::after {
+  .summary-row::after {
     content: '';
     flex: 1;
     order: 1;
     border-bottom: 3px dotted var(--ink-soft);
-    transform: translateY(-0.35em);
+    transform: translateY(-0.25em);
   }
-  .total strong {
+  .summary-row dt {
+    font-size: var(--text-base);
+  }
+  .summary-row dd {
     order: 2;
+    margin: 0;
+    white-space: nowrap;
+  }
+  .summary-total {
+    font-family: var(--font-display);
+    text-transform: uppercase;
     font-weight: 400;
+    font-size: var(--text-lg);
+  }
+  .summary-total dd {
     font-size: var(--text-xl);
     color: var(--tomato-ink);
+  }
+  .summary-free {
+    color: var(--basil);
+    text-transform: uppercase;
+    font-weight: 800;
+    font-size: var(--text-sm);
+    letter-spacing: 0.05em;
+  }
+  .free-nudge {
+    margin: calc(-1 * var(--space-2)) 0 var(--space-3);
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-size: var(--text-base);
+    color: var(--basil);
+  }
+  .checkout-summary {
+    /* The checkout grid's own gap provides the spacing */
+    margin-bottom: 0;
+    padding-bottom: var(--space-2);
+    border-bottom: var(--border);
+  }
+  .success-total {
+    font-weight: 700;
+    color: var(--tomato-ink);
+    margin: 0;
   }
   .checkout-button {
     width: 100%;

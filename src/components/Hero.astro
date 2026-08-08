@@ -40,6 +40,13 @@ const garnish = [
         <a href="#builder" class="btn btn-primary hero-cta">Build your pizza</a>
         <a href="#menu" class="hero-menu-link">or trust the menu ↓</a>
       </div>
+
+      <!-- Social proof beside the CTA: the classic rating-near-the-ask pattern -->
+      <p class="hero-proof">
+        <span class="hero-stars" aria-hidden="true">★★★★★</span>
+        <span class="sr-only">Rated 4.9 out of 5.</span>
+        <strong>4.9</strong> — from 812 Neapolitans with opinions
+      </p>
     </div>
 
     <div class="hero-visual" id="hero-visual">
@@ -194,6 +201,22 @@ const garnish = [
   }
   .hero-menu-link:hover {
     color: var(--tomato-ink);
+  }
+
+  .hero-proof {
+    margin-top: var(--space-3);
+    font-size: var(--text-base);
+    font-weight: 600;
+    color: var(--ink-soft);
+  }
+  .hero-stars {
+    color: var(--mustard);
+    letter-spacing: 0.1em;
+    margin-right: 0.35em;
+    text-shadow: 1px 1px 0 var(--ink);
+  }
+  .hero-proof strong {
+    color: var(--ink);
   }
 
   .hero-visual {

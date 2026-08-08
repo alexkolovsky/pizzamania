@@ -31,6 +31,17 @@ export const cartTotal = computed(cartItems, (items) =>
   items.reduce((sum, item) => sum + pizzaPrice(item.ingredientSlugs, item.size) * item.qty, 0),
 );
 
+/* Delivery pricing, surfaced from the first cart view onward — no cost
+   surprises at checkout. Values in cents. */
+export const DELIVERY_FEE = 290;
+export const FREE_DELIVERY_MIN = 2500;
+
+export const deliveryFee = computed(cartTotal, (subtotal) =>
+  subtotal === 0 || subtotal >= FREE_DELIVERY_MIN ? 0 : DELIVERY_FEE,
+);
+
+export const orderTotal = computed([cartTotal, deliveryFee], (subtotal, fee) => subtotal + fee);
+
 let nextId = 1;
 
 export function addToCart(name: string, ingredientSlugs: string[], size: SizeId = 'M'): void {
