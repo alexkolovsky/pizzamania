@@ -23,9 +23,10 @@
 
   let selected = $state<string[]>([]);
   let placematEl: HTMLDivElement | undefined = $state();
-  let actionsEl: HTMLDivElement | undefined = $state();
-  // Drives the mobile sticky order bar: hidden while the in-flow summary
-  // (canvas column actions) is already on screen, so controls never double up
+  let summaryEl: HTMLDivElement | undefined = $state();
+  // Drives the mobile order bar: it hides only while the in-flow price
+  // block is on screen, so price and controls are always reachable but
+  // never doubled up
   let summaryVisible = $state(true);
   let size = $state<SizeId>('M');
   let giovanniActive = $state(false);
@@ -52,12 +53,14 @@
   const sizeCm = $derived(sizes.find((s) => s.id === size)?.cm ?? 32);
 
   $effect(() => {
-    if (!actionsEl) return;
+    if (!summaryEl) return;
+    // Bottom margin excludes the bar's own strip, so the summary only counts
+    // as "visible" once it's actually readable above the bar
     const observer = new IntersectionObserver(
       ([entry]) => (summaryVisible = entry?.isIntersecting ?? false),
-      { rootMargin: '0px 0px -56px 0px' },
+      { rootMargin: '0px 0px -76px 0px' },
     );
-    observer.observe(actionsEl);
+    observer.observe(summaryEl);
     return () => observer.disconnect();
   });
 
@@ -252,7 +255,7 @@
           </div>
         </fieldset>
 
-        <div class="builder-summary">
+        <div class="builder-summary" bind:this={summaryEl}>
           <p class="builder-name">
             <span>{pizzaName}</span>
             <span class="builder-dots" aria-hidden="true"></span>
@@ -279,7 +282,7 @@
             </ul>
           {/if}
 
-          <div class="builder-actions" bind:this={actionsEl}>
+          <div class="builder-actions">
             <button type="button" class="btn btn-primary" onclick={handleAddToOrder}>
               Add to order
             </button>
@@ -346,9 +349,10 @@
       </div>
     </div>
 
-    <!-- Mobile sticky order bar: sticks to the viewport bottom while the
-         tray is scrolled, hides whenever the real summary is on screen -->
-    <div class="order-bar" class:order-bar-hidden={summaryVisible}>
+    <!-- Mobile order bar: fixed to the viewport bottom anywhere on the page
+         once the pizza has toppings; hides only while the in-flow price
+         block is on screen -->
+    <div class="order-bar" class:order-bar-hidden={summaryVisible || selected.length === 0}>
       <div class="order-bar-info">
         <span class="order-bar-name">{pizzaName}</span>
         <span class="order-bar-meta">{size} · {sizeCm} cm · {selected.length} topping{selected.length === 1 ? '' : 's'}</span>
@@ -660,24 +664,24 @@
 
   /* ---- Sticky order bar (stacked layout only) ---- */
   .order-bar {
-    position: sticky;
-    bottom: calc(var(--space-2) + env(safe-area-inset-bottom));
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
     z-index: 90;
     display: none;
     align-items: center;
     gap: var(--space-3);
-    margin-top: var(--space-4);
-    padding: var(--space-2) var(--space-3);
+    padding: var(--space-2) max(var(--space-3), env(safe-area-inset-left)) calc(var(--space-2) + env(safe-area-inset-bottom)) max(var(--space-3), env(safe-area-inset-right));
     background: var(--cream);
-    border: var(--border);
-    border-radius: var(--radius);
-    box-shadow: var(--shadow-hard);
+    border-top: var(--border);
+    box-shadow: 0 -8px 24px rgba(33, 26, 18, 0.16);
     transition: transform 0.25s ease, opacity 0.25s ease, visibility 0.25s;
   }
   .order-bar-hidden {
     visibility: hidden; /* also removes the duplicate button from tab order */
     opacity: 0;
-    transform: translateY(140%);
+    transform: translateY(110%);
   }
   @media (prefers-reduced-motion: reduce) {
     .order-bar {
