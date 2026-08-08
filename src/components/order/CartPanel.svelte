@@ -19,15 +19,51 @@
   type Stage = 'cart' | 'checkout' | 'success';
 
   let stage = $state<Stage>('cart');
-  let customerName = $state('');
-  let customerAddress = $state('');
-  let nameError = $state('');
-  let addressError = $state('');
-  let orderedName = $state('');
 
-  let nameInput: HTMLInputElement | undefined = $state();
-  let addressInput: HTMLInputElement | undefined = $state();
+  /* Countries the fictional Vespa fleet is willing to reach. Italy first
+     (home turf), the rest alphabetical. `dial` only feeds the phone
+     placeholder — numbers are validated permissively either way. */
+  const countries = [
+    { code: 'IT', name: 'Italy', dial: '+39' },
+    { code: 'AT', name: 'Austria', dial: '+43' },
+    { code: 'BE', name: 'Belgium', dial: '+32' },
+    { code: 'FR', name: 'France', dial: '+33' },
+    { code: 'DE', name: 'Germany', dial: '+49' },
+    { code: 'NL', name: 'Netherlands', dial: '+31' },
+    { code: 'PT', name: 'Portugal', dial: '+351' },
+    { code: 'SI', name: 'Slovenia', dial: '+386' },
+    { code: 'ES', name: 'Spain', dial: '+34' },
+    { code: 'CH', name: 'Switzerland', dial: '+41' },
+  ] as const;
+
+  type FieldId = 'name' | 'phone' | 'street' | 'postal' | 'city';
+
+  const blankForm = { name: '', phone: '', country: 'IT', street: '', postal: '', city: '' };
+  let form = $state({ ...blankForm });
+  let errors = $state<Partial<Record<FieldId, string>>>({});
+  let orderedName = $state('');
+  let orderedPlace = $state('');
+
   let orderButton: HTMLButtonElement | undefined = $state();
+
+  const dialHint = $derived(countries.find((c) => c.code === form.country)?.dial ?? '+39');
+
+  /* Delivery details survive reloads so a repeat order is prefilled.
+     Guarded: this component also renders during the server build. */
+  const DELIVERY_KEY = 'pizzamania-delivery';
+  if (typeof localStorage !== 'undefined') {
+    try {
+      const saved = JSON.parse(localStorage.getItem(DELIVERY_KEY) ?? 'null');
+      if (saved && typeof saved === 'object') {
+        for (const key of Object.keys(blankForm) as (keyof typeof blankForm)[]) {
+          if (typeof saved[key] === 'string') form[key] = saved[key];
+        }
+        if (!countries.some((c) => c.code === form.country)) form.country = 'IT';
+      }
+    } catch {
+      /* private mode or corrupt JSON — start blank */
+    }
+  }
 
   const motionDuration = () => (prefersReducedMotion() ? 0 : 260);
 
@@ -74,19 +110,33 @@
   }
 
   function validate(): boolean {
-    nameError = customerName.trim().length >= 2 ? '' : 'Please tell us your name (at least 2 letters).';
-    addressError =
-      customerAddress.trim().length >= 8
-        ? ''
-        : 'Please give us a full address — Vespas need directions.';
-    if (nameError) {
-      nameInput?.focus();
-      announce(`Form error: ${nameError}`);
-      return false;
+    const next: typeof errors = {};
+    if (form.name.trim().length < 2) {
+      next.name = 'Please tell us your name (at least 2 letters).';
     }
-    if (addressError) {
-      addressInput?.focus();
-      announce(`Form error: ${addressError}`);
+    // Permissive on purpose: spaces, dashes, dots and parens are fine,
+    // we only insist on something dialable underneath
+    const dialable = form.phone.replace(/[\s\-().]/g, '');
+    if (!/^\+?\d{6,15}$/.test(dialable)) {
+      next.phone = 'Please add a phone number — the courier calls when the Vespa arrives.';
+    }
+    if (form.street.trim().length < 4) {
+      next.street = 'Please give us a street and number — Vespas need directions.';
+    }
+    if (!/^[A-Za-z0-9][A-Za-z0-9 -]{1,9}$/.test(form.postal.trim())) {
+      next.postal = 'That postal code looks off.';
+    }
+    if (form.city.trim().length < 2) {
+      next.city = 'Which city are we riding to?';
+    }
+    errors = next;
+    // Focus follows DOM order so the fix-up flow reads top to bottom
+    const first = (['name', 'phone', 'street', 'postal', 'city'] as FieldId[]).find(
+      (field) => next[field],
+    );
+    if (first) {
+      document.getElementById(`order-${first}`)?.focus();
+      announce(`Form error: ${next[first]}`);
       return false;
     }
     return true;
@@ -95,14 +145,19 @@
   function submitOrder(event: SubmitEvent) {
     event.preventDefault();
     if (!validate()) return;
-    orderedName = customerName.trim();
+    orderedName = form.name.trim();
+    orderedPlace = `${form.street.trim()}, ${form.city.trim()}`;
     stage = 'success';
     announce(
       `Order placed for ${orderedName}. Total ${euroSpoken($cartTotal)}. Grazie! Your pizza is in the fictional oven.`,
     );
     clearCart();
-    customerName = '';
-    customerAddress = '';
+    // Details stay in the form (and in storage) so the next order is prefilled
+    try {
+      localStorage.setItem(DELIVERY_KEY, JSON.stringify({ ...form }));
+    } catch {
+      /* storage full or blocked — the order still goes through */
+    }
   }
 </script>
 
@@ -203,32 +258,88 @@
             id="order-name"
             type="text"
             autocomplete="name"
-            bind:value={customerName}
-            bind:this={nameInput}
-            aria-invalid={nameError ? 'true' : undefined}
-            aria-describedby={nameError ? 'order-name-error' : undefined}
+            bind:value={form.name}
+            aria-invalid={errors.name ? 'true' : undefined}
+            aria-describedby={errors.name ? 'order-name-error' : undefined}
             data-autofocus
           />
-          {#if nameError}
-            <p class="field-error" id="order-name-error">{nameError}</p>
+          {#if errors.name}
+            <p class="field-error" id="order-name-error">{errors.name}</p>
           {/if}
         </div>
 
         <div class="field">
-          <label for="order-address">Delivery address</label>
+          <label for="order-phone">Phone</label>
           <input
-            id="order-address"
-            type="text"
-            autocomplete="street-address"
-            bind:value={customerAddress}
-            bind:this={addressInput}
-            aria-invalid={addressError ? 'true' : undefined}
-            aria-describedby={addressError ? 'order-address-error' : undefined}
+            id="order-phone"
+            type="tel"
+            inputmode="tel"
+            autocomplete="tel"
+            placeholder="{dialHint} 333 123 4567"
+            bind:value={form.phone}
+            aria-invalid={errors.phone ? 'true' : undefined}
+            aria-describedby={errors.phone ? 'order-phone-error' : undefined}
           />
-          {#if addressError}
-            <p class="field-error" id="order-address-error">{addressError}</p>
+          {#if errors.phone}
+            <p class="field-error" id="order-phone-error">{errors.phone}</p>
           {/if}
         </div>
+
+        <div class="field">
+          <label for="order-country">Country</label>
+          <select id="order-country" autocomplete="country" bind:value={form.country}>
+            {#each countries as country (country.code)}
+              <option value={country.code}>{country.name}</option>
+            {/each}
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="order-street">Street and number</label>
+          <input
+            id="order-street"
+            type="text"
+            autocomplete="address-line1"
+            bind:value={form.street}
+            aria-invalid={errors.street ? 'true' : undefined}
+            aria-describedby={errors.street ? 'order-street-error' : undefined}
+          />
+          {#if errors.street}
+            <p class="field-error" id="order-street-error">{errors.street}</p>
+          {/if}
+        </div>
+
+        <div class="field-row">
+          <div class="field field-postal">
+            <label for="order-postal">Postal code</label>
+            <input
+              id="order-postal"
+              type="text"
+              autocomplete="postal-code"
+              bind:value={form.postal}
+              aria-invalid={errors.postal ? 'true' : undefined}
+              aria-describedby={errors.postal ? 'order-postal-error' : undefined}
+            />
+          </div>
+          <div class="field field-city">
+            <label for="order-city">City</label>
+            <input
+              id="order-city"
+              type="text"
+              autocomplete="address-level2"
+              bind:value={form.city}
+              aria-invalid={errors.city ? 'true' : undefined}
+              aria-describedby={errors.city ? 'order-city-error' : undefined}
+            />
+          </div>
+        </div>
+        <!-- Row errors live below the row so the two inputs stay aligned -->
+        {#if errors.postal}
+          <p class="field-error row-error" id="order-postal-error">{errors.postal}</p>
+        {/if}
+        {#if errors.city}
+          <p class="field-error row-error" id="order-city-error">{errors.city}</p>
+        {/if}
 
         <div class="checkout-actions">
           <div class="dodge-zone">
@@ -258,7 +369,8 @@
         <p class="success-lead">Grazie, {orderedName}!</p>
         <p>
           Your pizza is in the (entirely fictional) wood-fired oven. A courier on a Vespa is
-          already arguing with traffic on your behalf. Estimated delivery: one daydream.
+          already arguing with traffic on the way to {orderedPlace}. We'll call before ringing.
+          Estimated delivery: one daydream.
         </p>
         <button type="button" class="btn btn-primary" onclick={close}>Perfetto</button>
       </div>
@@ -481,7 +593,12 @@
     font-size: var(--text-sm);
     letter-spacing: 0.05em;
   }
-  .field input {
+  .field input,
+  .field select {
+    /* Kill the ~26ch intrinsic width — on narrow panels the auto grid
+       track would otherwise size to it and overflow the panel */
+    width: 100%;
+    min-width: 0;
     min-height: 48px;
     padding: 0 var(--space-3);
     border: var(--border);
@@ -491,7 +608,22 @@
     font-size: var(--text-base);
     color: var(--ink);
   }
-  .field input:focus-visible {
+  .field input::placeholder {
+    color: var(--ink-soft);
+    opacity: 0.65;
+  }
+  .field select {
+    appearance: none;
+    cursor: pointer;
+    /* Hand-drawn-ish chevron, inked to match the border color */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 14 9'%3E%3Cpath d='M1.5 1.5 L7 7 L12.5 1.5' fill='none' stroke='%23211a12' stroke-width='2.5' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right var(--space-3) center;
+    background-size: 14px 9px;
+    padding-right: calc(var(--space-3) * 2 + 14px);
+  }
+  .field input:focus-visible,
+  .field select:focus-visible {
     outline: 3px solid var(--tomato);
     outline-offset: 2px;
   }
@@ -504,6 +636,22 @@
     font-size: var(--text-sm);
     font-weight: 700;
     color: var(--tomato-ink);
+  }
+
+  .field-row {
+    display: flex;
+    gap: var(--space-2);
+  }
+  .field-postal {
+    flex: 0 0 8.5rem;
+  }
+  .field-city {
+    flex: 1;
+    min-width: 0;
+  }
+  /* Snug the row's errors up against it despite the form grid's gap */
+  .row-error {
+    margin-top: calc(-1 * var(--space-2));
   }
 
   .checkout-actions {
