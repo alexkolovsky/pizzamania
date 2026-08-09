@@ -192,6 +192,13 @@ export const uk: Dict = {
       `${name} — завантажено в конструктор. ${summary}.`,
     pineappleToast: '«Mamma mia! Жодних ананасів на піці!» …Va bene. Джованні дозволяє. Неохоче.',
     pineappleAnnounce: 'Шеф Джованні протестує проти ананаса, драматично зітхає і дозволяє.',
+    pineappleToastAgain: '«Ancora?! Знову ананас?!» …Джованні нічого не бачив.',
+    pineappleAnnounceAgain: 'Шеф Джованні протестує знову, а потім вдає, що нічого не бачив.',
+    pineappleToastResigned: 'Джованні мовчки дивиться в дровʼяну піч.',
+    pineappleAnnounceResigned: 'У Джованні закінчилися протести. Ананас лягає на піцу.',
+    pineappleRemovedToast: '«Grazie.» — Джованні, з помітним полегшенням',
+    pineappleRemovedAnnounce: (price: string) =>
+      `Ананас прибрано. Джованні полегшено видихає. Ціна піци ${price}.`,
     ingredientAdded: (name: string, price: string) =>
       `Додано: ${name}. Ціна піци ${price}.`,
     ingredientRemoved: (name: string, price: string) =>
@@ -211,6 +218,9 @@ export const uk: Dict = {
     strong: 'Mamma mia!',
     line1: ' Жодних ананасів на піці!',
     line2: '…va bene, va bene. Лише цього разу.',
+    againStrong: 'Ancora?!',
+    againLine1: ' Знову ананас?!',
+    againLine2: '…va bene. VA BENE. Джованні нічого не бачив.',
   },
 
   cart: {

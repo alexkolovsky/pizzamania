@@ -181,6 +181,14 @@ export const it: Dict = {
     pineappleToast: '«Mamma mia! Niente ananas sulla pizza!» …Va bene. Giovanni lo permette. Controvoglia.',
     pineappleAnnounce:
       "Lo chef Giovanni protesta contro l'ananas, sospira teatralmente e lo permette.",
+    pineappleToastAgain: "«Ancora?! Di nuovo l'ananas?!» …Giovanni non ha visto niente.",
+    pineappleAnnounceAgain:
+      'Lo chef Giovanni protesta di nuovo, poi finge di non aver visto niente.',
+    pineappleToastResigned: 'Giovanni fissa il forno a legna, in silenzio.',
+    pineappleAnnounceResigned: "Giovanni ha finito le proteste. L'ananas va sulla pizza.",
+    pineappleRemovedToast: '«Grazie.» — Giovanni, visibilmente sollevato',
+    pineappleRemovedAnnounce: (price: string) =>
+      `Ananas tolto. Giovanni tira un sospiro di sollievo. Prezzo della pizza ${price}.`,
     ingredientAdded: (name: string, price: string) =>
       `Aggiunto: ${name}. Prezzo della pizza ${price}.`,
     ingredientRemoved: (name: string, price: string) =>
@@ -202,6 +210,9 @@ export const it: Dict = {
     strong: 'Mamma mia!',
     line1: ' Niente ananas sulla pizza!',
     line2: '…va bene, va bene. Solo per stavolta.',
+    againStrong: 'Ancora?!',
+    againLine1: " Di nuovo l'ananas?!",
+    againLine2: '…va bene. VA BENE. Giovanni non ha visto niente.',
   },
 
   cart: {

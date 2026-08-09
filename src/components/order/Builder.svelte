@@ -23,7 +23,15 @@
   // snapshot at component init is safe on both server and client.
   const T = t();
 
-  const GIOVANNI_SEEN_KEY = 'pizzamania-giovanni-seen';
+  /* Giovanni's pineapple protest escalates within a session: full scene,
+     angrier encore, then wordless resignation. The count survives reloads
+     (sessionStorage) so he doesn't reset to outrage on every visit. */
+  const GIOVANNI_COUNT_KEY = 'pizzamania-giovanni-count';
+
+  function pineappleProtests(): number {
+    const n = Number(sessionStorage.getItem(GIOVANNI_COUNT_KEY));
+    return Number.isFinite(n) && n > 0 ? n : 0;
+  }
 
   let selected = $state<string[]>([]);
   let placematEl: HTMLDivElement | undefined = $state();
@@ -35,6 +43,7 @@
   let summaryVisible = $state(true);
   let size = $state<SizeId>('M');
   let giovanniActive = $state(false);
+  let giovanniVariant = $state<'first' | 'again'>('first');
   // One lasagna joke per crossing of the 10-topping line, not per topping after it
   let lasagnaWarned = false;
 
@@ -88,22 +97,41 @@
     const ingredient = ingredientBySlug.get(slug);
     if (!ingredient) return;
 
-    // Giovanni's pineapple protest — once per session, never blocking:
-    // the topping goes on immediately, he just has feelings about it.
-    if (slug === 'ananas' && !sessionStorage.getItem(GIOVANNI_SEEN_KEY)) {
-      sessionStorage.setItem(GIOVANNI_SEEN_KEY, '1');
-      if (prefersReducedMotion()) {
-        showToast(T.builder.pineappleToast);
-      } else {
-        giovanniActive = true;
-      }
-      announce(T.builder.pineappleAnnounce);
-    }
-
     selected = [...selected, slug];
     pulseCanvas();
     pulseBar();
-    announce(T.builder.ingredientAdded(T.ingredients[slug], T.euroSpoken(priceAfter(selected))));
+    const added = T.builder.ingredientAdded(T.ingredients[slug], T.euroSpoken(priceAfter(selected)));
+
+    // Giovanni's pineapple protest — never blocking, the topping goes on
+    // immediately. He escalates: full scene, angrier encore, resignation.
+    // His line and the price ride one announcement so neither overwrites
+    // the other in the shared live region.
+    if (slug === 'ananas') {
+      const protests = pineappleProtests();
+      sessionStorage.setItem(GIOVANNI_COUNT_KEY, String(protests + 1));
+      if (protests === 0) {
+        if (prefersReducedMotion()) {
+          showToast(T.builder.pineappleToast);
+        } else {
+          giovanniVariant = 'first';
+          giovanniActive = true;
+        }
+        announce(`${T.builder.pineappleAnnounce} ${added}`);
+      } else if (protests === 1) {
+        if (prefersReducedMotion()) {
+          showToast(T.builder.pineappleToastAgain);
+        } else {
+          giovanniVariant = 'again';
+          giovanniActive = true;
+        }
+        announce(`${T.builder.pineappleAnnounceAgain} ${added}`);
+      } else {
+        showToast(T.builder.pineappleToastResigned);
+        announce(`${T.builder.pineappleAnnounceResigned} ${added}`);
+      }
+    } else {
+      announce(added);
+    }
 
     if (selected.length >= 10 && !lasagnaWarned) {
       lasagnaWarned = true;
@@ -117,11 +145,18 @@
     selected = selected.filter((s) => s !== slug);
     pulseBar();
     if (selected.length < 10) lasagnaWarned = false;
-    if (ingredient) {
-      announce(
-        T.builder.ingredientRemoved(T.ingredients[slug], T.euroSpoken(priceAfter(selected))),
-      );
+    if (!ingredient) return;
+
+    // Taking the pineapple off earns visible relief — while he still cares.
+    // Once he's resigned (3+ protests), he no longer reacts to anything.
+    if (slug === 'ananas' && pineappleProtests() <= 2) {
+      showToast(T.builder.pineappleRemovedToast);
+      announce(T.builder.pineappleRemovedAnnounce(T.euroSpoken(priceAfter(selected))));
+      return;
     }
+    announce(
+      T.builder.ingredientRemoved(T.ingredients[slug], T.euroSpoken(priceAfter(selected))),
+    );
   }
 
   function toggle(slug: string) {
@@ -397,7 +432,7 @@
 </section>
 
 {#if giovanniActive}
-  <Giovanni ondone={() => (giovanniActive = false)} />
+  <Giovanni variant={giovanniVariant} ondone={() => (giovanniActive = false)} />
 {/if}
 
 <style>

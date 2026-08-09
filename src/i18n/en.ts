@@ -182,6 +182,13 @@ export const en = {
       `${name} loaded into the builder. ${summary}.`,
     pineappleToast: '“Mamma mia! No ananas on pizza!” …Va bene. Giovanni allows it. Reluctantly.',
     pineappleAnnounce: 'Chef Giovanni protests the pineapple, sighs dramatically, and allows it.',
+    pineappleToastAgain: '“Ancora?! The pineapple again?!” …Giovanni saw nothing.',
+    pineappleAnnounceAgain: 'Chef Giovanni protests again, then pretends he saw nothing.',
+    pineappleToastResigned: 'Giovanni stares into the wood-fired oven, saying nothing.',
+    pineappleAnnounceResigned: 'Giovanni has run out of protests. The pineapple goes on.',
+    pineappleRemovedToast: '“Grazie.” — Giovanni, visibly relieved',
+    pineappleRemovedAnnounce: (price: string) =>
+      `Pineapple removed. Giovanni exhales. Pizza price ${price}.`,
     ingredientAdded: (name: string, price: string) => `${name} added. Pizza price ${price}.`,
     ingredientRemoved: (name: string, price: string) => `${name} removed. Pizza price ${price}.`,
     lasagnaToast: '“This is not pizza anymore, this is lasagna!” — Giovanni, resigned',
@@ -199,6 +206,9 @@ export const en = {
     strong: 'Mamma mia!',
     line1: ' No ananas on pizza!',
     line2: '…va bene, va bene. This one time.',
+    againStrong: 'Ancora?!',
+    againLine1: ' The pineapple AGAIN?!',
+    againLine2: '…va bene. VA BENE. Giovanni saw nothing.',
   },
 
   cart: {

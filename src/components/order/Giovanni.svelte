@@ -10,7 +10,12 @@
 
   const T = t();
 
-  let { ondone }: { ondone: () => void } = $props();
+  let { ondone, variant = 'first' }: { ondone: () => void; variant?: 'first' | 'again' } =
+    $props();
+
+  // The encore is angrier: he storms in faster, wags longer, and leaves
+  // sooner — outrage has a schedule.
+  const again = variant === 'again';
 
   let scene: HTMLDivElement;
   let bubble: HTMLDivElement;
@@ -26,12 +31,12 @@
       if (cancelled) return;
       timeline = gsap
         .timeline({ onComplete: ondone })
-        .fromTo(scene, { x: -280, rotation: -4 }, { x: 0, rotation: 0, duration: 0.55, ease: 'back.out(1.4)' })
+        .fromTo(scene, { x: -280, rotation: -4 }, { x: 0, rotation: 0, duration: again ? 0.4 : 0.55, ease: 'back.out(1.4)' })
         .fromTo(bubble, { scale: 0, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.3, ease: 'back.out(2)' })
-        .to(arm, { rotation: -22, transformOrigin: '80% 85%', duration: 0.16, repeat: 5, yoyo: true, ease: 'power1.inOut' })
-        .to({}, { duration: 1.0 }) // Giovanni glares in silence
+        .to(arm, { rotation: again ? -26 : -22, transformOrigin: '80% 85%', duration: again ? 0.13 : 0.16, repeat: again ? 9 : 5, yoyo: true, ease: 'power1.inOut' })
+        .to({}, { duration: again ? 0.6 : 1.0 }) // Giovanni glares in silence
         .to(bubble, { scale: 0.6, opacity: 0, duration: 0.25, ease: 'power2.in' })
-        .to(scene, { x: -280, rotation: -3, duration: 0.45, ease: 'power2.in' }, '<0.05');
+        .to(scene, { x: -280, rotation: -3, duration: again ? 0.35 : 0.45, ease: 'power2.in' }, '<0.05');
     });
 
     return () => {
@@ -43,8 +48,13 @@
 
 <div class="giovanni" bind:this={scene} aria-hidden="true">
   <div class="bubble" bind:this={bubble}>
-    <strong>{T.giovanni.strong}</strong>{T.giovanni.line1}<br />
-    <em>{T.giovanni.line2}</em>
+    {#if again}
+      <strong>{T.giovanni.againStrong}</strong>{T.giovanni.againLine1}<br />
+      <em>{T.giovanni.againLine2}</em>
+    {:else}
+      <strong>{T.giovanni.strong}</strong>{T.giovanni.line1}<br />
+      <em>{T.giovanni.line2}</em>
+    {/if}
   </div>
   <svg viewBox="0 0 200 240" width="170" height="204">
     <!-- body + apron -->
