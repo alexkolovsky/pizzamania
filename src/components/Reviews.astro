@@ -1,41 +1,26 @@
 ---
 // Social proof between the builder and the story: three short reviews and
 // an aggregate line. Static copy, same trattoria art direction as the menu.
-const reviews = [
-  {
-    quote: 'The margherita made me call my nonna to apologize. For what? Everything.',
-    name: 'Lucia R.',
-    place: 'Napoli',
-  },
-  {
-    quote:
-      'I ordered pineapple. Giovanni allowed it. I felt judged, fed and forgiven — in that order.',
-    name: 'Marek D.',
-    place: 'Wien',
-  },
-  {
-    quote: '48-hour dough, 90-second bake, gone in 40 seconds. The math checks out.',
-    name: 'Sofia T.',
-    place: 'Milano',
-  },
-];
+import { getDict } from '../i18n';
+
+const t = getDict(Astro.currentLocale);
 ---
 
 <section class="section reviews" aria-labelledby="reviews-heading">
   <div class="container">
-    <span class="section-kicker">Parola di cliente</span>
-    <h2 id="reviews-heading">Word on the vicolo</h2>
+    <span class="section-kicker">{t.reviews.kicker}</span>
+    <h2 id="reviews-heading">{t.reviews.heading}</h2>
     <p class="reviews-aggregate">
       <span class="reviews-stars" aria-hidden="true">★★★★★</span>
-      <span class="sr-only">Rated 4.9 out of 5.</span>
-      <strong>4.9 / 5</strong> from 812 orders that arrived warm.
+      <span class="sr-only">{t.reviews.ratedSr}</span>
+      <strong>4.9 / 5</strong> {t.reviews.aggregate}
     </p>
 
     <ul class="reviews-grid" role="list">
-      {reviews.map((review) => (
+      {t.reviews.quotes.map((review) => (
         <li class="review-card">
           <p class="review-stars" aria-hidden="true">★★★★★</p>
-          <span class="sr-only">Five stars.</span>
+          <span class="sr-only">{t.reviews.fiveStarsSr}</span>
           <blockquote class="review-quote">
             <p>&ldquo;{review.quote}&rdquo;</p>
           </blockquote>

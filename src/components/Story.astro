@@ -1,29 +1,19 @@
 ---
 // Two paragraphs of real copy — the "love letter to Neapolitan pizza".
+import { getDict } from '../i18n';
+
+const t = getDict(Astro.currentLocale);
 ---
 
 <section id="story" class="section story" aria-labelledby="story-heading">
   <div class="container story-inner">
-    <span class="section-kicker">La nostra storia</span>
-    <h2 id="story-heading">A love letter to Neapolitan pizza</h2>
-    <p>
-      It starts, like most good things in Naples, with an argument. Flour, water, salt, yeast —
-      four ingredients, and somehow forty opinions about them. Our dough rests for 48 hours
-      because patience is the fifth ingredient nobody writes down. Then it meets a wood-fired
-      oven at 450 degrees for ninety seconds — just long enough for the crust to puff, char and
-      blister into something you'll tear into before it reaches the table. We've seen it happen.
-      We no longer judge.
-    </p>
+    <span class="section-kicker">{t.story.kicker}</span>
+    <h2 id="story-heading">{t.story.heading}</h2>
+    <p>{t.story.p1}</p>
     <blockquote class="story-quote">
-      <p>&ldquo;The recipe survived three generations, two emigrations, and one very heated
-      debate about pineapple the family still calls <em>the incident</em>.&rdquo;</p>
+      <p>&ldquo;{t.story.quoteBefore}<em>{t.story.quoteEm}</em>{t.story.quoteAfter}&rdquo;</p>
     </blockquote>
-    <p>
-      Giovanni, our chef, learned the craft from his grandmother, who learned it from hers, who
-      — according to family legend — once refused to serve a mayor because he asked for
-      ketchup. Every pizza that leaves our oven carries all of that history, plus exactly the
-      toppings you asked for. Even the pineapple. Giovanni just needs a moment first.
-    </p>
+    <p>{t.story.p2}</p>
   </div>
 </section>
 

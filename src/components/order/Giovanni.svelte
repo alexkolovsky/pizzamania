@@ -6,6 +6,9 @@
    * when motion is allowed; reduced-motion users get a static toast instead.
    */
   import { onMount } from 'svelte';
+  import { t } from '../../i18n/runtime';
+
+  const T = t();
 
   let { ondone }: { ondone: () => void } = $props();
 
@@ -40,8 +43,8 @@
 
 <div class="giovanni" bind:this={scene} aria-hidden="true">
   <div class="bubble" bind:this={bubble}>
-    <strong>Mamma mia!</strong> No ananas on pizza!<br />
-    <em>…va bene, va bene. This one time.</em>
+    <strong>{T.giovanni.strong}</strong>{T.giovanni.line1}<br />
+    <em>{T.giovanni.line2}</em>
   </div>
   <svg viewBox="0 0 200 240" width="170" height="204">
     <!-- body + apron -->

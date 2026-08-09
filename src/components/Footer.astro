@@ -1,18 +1,23 @@
+---
+import { getDict } from '../i18n';
+
+const t = getDict(Astro.currentLocale);
+---
+
 <footer class="footer">
   <div class="container footer-grid">
     <div>
       <p class="footer-logo">PizzaMania</p>
-      <p class="footer-tag">Wood-fired since forever. Pineapple-tolerant since 2024.</p>
+      <p class="footer-tag">{t.footer.tag}</p>
     </div>
     <div>
-      <h2 class="footer-heading">Hours</h2>
+      <h2 class="footer-heading">{t.footer.hoursHeading}</h2>
       <ul class="footer-list" role="list">
-        <li>Tue–Sun: 12:00–15:00, 18:00–23:30</li>
-        <li>Monday: closed (dough is resting, so is Giovanni)</li>
+        {t.footer.hoursLines.map((line) => <li>{line}</li>)}
       </ul>
     </div>
     <div>
-      <h2 class="footer-heading">Find us</h2>
+      <h2 class="footer-heading">{t.footer.findHeading}</h2>
       <address class="footer-address">
         Vico della Mozzarella 17<br />
         80134 Napoli, Italia<br />
@@ -20,7 +25,7 @@
       </address>
     </div>
     <div>
-      <h2 class="footer-heading">Follow</h2>
+      <h2 class="footer-heading">{t.footer.followHeading}</h2>
       <ul class="footer-list" role="list">
         <li><a href="#top">Instagram</a></li>
         <li><a href="#top">Facebook</a></li>
@@ -29,7 +34,7 @@
     </div>
   </div>
   <div class="container footer-fine">
-    <p>&copy; 2026 Pizza Mania. A fictional pizzeria for the dev.to Perfect Landing challenge. No pizzas were harmed.</p>
+    <p>{t.footer.fine}</p>
   </div>
 </footer>
 

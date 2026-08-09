@@ -2,7 +2,6 @@
   import {
     ingredients,
     ingredientBySlug,
-    groupLabels,
     groupOrder,
     BASE_LAYER_SRC,
     type Ingredient,
@@ -11,13 +10,18 @@
   import { addToCart, builderPreset, recipeSummary } from '../../stores/cart';
   import { showToast } from '../../stores/toasts';
   import { announce } from '../../lib/announce';
-  import { euro, euroSpoken } from '../../lib/format';
+  import { euro } from '../../lib/format';
   import { prefersReducedMotion } from '../../lib/motion';
+  import { t } from '../../i18n/runtime';
   import Giovanni from './Giovanni.svelte';
   import ToppingLayer from './ToppingLayer.svelte';
 
   import { scale } from 'svelte/transition';
   import { tick } from 'svelte';
+
+  // Locale is fixed per page (switching languages navigates), so one
+  // snapshot at component init is safe on both server and client.
+  const T = t();
 
   const GIOVANNI_SEEN_KEY = 'pizzamania-giovanni-seen';
 
@@ -46,10 +50,10 @@
         p.ingredientSlugs.length === selected.length &&
         p.ingredientSlugs.every((slug) => selected.includes(slug)),
     );
-    return match ? match.name : 'Pizza su misura';
+    return match ? match.name : T.customPizza;
   });
   const canvasLabel = $derived(
-    `Your pizza so far: ${recipeSummary(selected).toLowerCase()}. Current price ${euroSpoken(price)}.`,
+    T.builder.canvasLabel(recipeSummary(selected).toLowerCase(), T.euroSpoken(price)),
   );
 
   $effect(() => {
@@ -70,7 +74,7 @@
       if (!preset) return;
       selected = [...preset.slugs];
       lasagnaWarned = false;
-      announce(`${preset.name} loaded into the builder. ${recipeSummary(selected)}.`);
+      announce(T.builder.presetLoaded(preset.name, recipeSummary(selected)));
       builderPreset.set(null);
     }),
   );
@@ -89,22 +93,22 @@
     if (slug === 'ananas' && !sessionStorage.getItem(GIOVANNI_SEEN_KEY)) {
       sessionStorage.setItem(GIOVANNI_SEEN_KEY, '1');
       if (prefersReducedMotion()) {
-        showToast('“Mamma mia! No ananas on pizza!” …Va bene. Giovanni allows it. Reluctantly.');
+        showToast(T.builder.pineappleToast);
       } else {
         giovanniActive = true;
       }
-      announce('Chef Giovanni protests the pineapple, sighs dramatically, and allows it.');
+      announce(T.builder.pineappleAnnounce);
     }
 
     selected = [...selected, slug];
     pulseCanvas();
     pulseBar();
-    announce(`${ingredient.name} added. Pizza price ${euroSpoken(priceAfter(selected))}.`);
+    announce(T.builder.ingredientAdded(T.ingredients[slug], T.euroSpoken(priceAfter(selected))));
 
     if (selected.length >= 10 && !lasagnaWarned) {
       lasagnaWarned = true;
-      showToast('“This is not pizza anymore, this is lasagna!” — Giovanni, resigned');
-      announce('Giovanni says: this is not pizza anymore, this is lasagna. Still allowed.');
+      showToast(T.builder.lasagnaToast);
+      announce(T.builder.lasagnaAnnounce);
     }
   }
 
@@ -114,7 +118,9 @@
     pulseBar();
     if (selected.length < 10) lasagnaWarned = false;
     if (ingredient) {
-      announce(`${ingredient.name} removed. Pizza price ${euroSpoken(priceAfter(selected))}.`);
+      announce(
+        T.builder.ingredientRemoved(T.ingredients[slug], T.euroSpoken(priceAfter(selected))),
+      );
     }
   }
 
@@ -144,8 +150,8 @@
 
   function handleAddToOrder() {
     if (selected.length === 0) {
-      showToast('Just bread? …I respect it.');
-      announce('Ordering a plain pizza. Giovanni says: just bread? I respect it.');
+      showToast(T.builder.justBreadToast);
+      announce(T.builder.justBreadAnnounce);
     }
     addToCart(pizzaName, selected, size);
   }
@@ -153,7 +159,7 @@
   function startOver() {
     selected = [];
     lasagnaWarned = false;
-    announce('Builder cleared. Back to a plain base.');
+    announce(T.builder.cleared);
   }
 
   /* Removing via a picked-chip destroys the focused element — re-anchor
@@ -202,7 +208,7 @@
 
     selected = [];
     lasagnaWarned = false;
-    announce('Giovanni is choosing toppings…');
+    announce(T.builder.choosing);
     picks.forEach((slug, i) => {
       setTimeout(() => {
         selected = [...selected, slug];
@@ -210,9 +216,9 @@
         if (i === picks.length - 1) {
           surpriseBusy = false;
           announce(
-            `Giovanni's choice: ${recipeSummary(selected)}. Pizza price ${euroSpoken(priceAfter(selected))}.`,
+            T.builder.chosen(recipeSummary(selected), T.euroSpoken(priceAfter(selected))),
           );
-          showToast('“Fidati.” (Trust me.) — Giovanni, choosing for you');
+          showToast(T.builder.fidatiToast);
         }
       }, 150 + i * step);
     });
@@ -220,20 +226,17 @@
 
   function tagNote(ingredient: Ingredient): string {
     const notes: string[] = [];
-    if (ingredient.tags.includes('vegan')) notes.push('vegan');
-    if (ingredient.tags.includes('spicy')) notes.push('spicy');
+    if (ingredient.tags.includes('vegan')) notes.push(T.builder.vegan);
+    if (ingredient.tags.includes('spicy')) notes.push(T.builder.spicy);
     return notes.length ? ` (${notes.join(', ')})` : '';
   }
 </script>
 
 <section id="builder" class="section builder" aria-labelledby="builder-heading" tabindex="-1">
   <div class="container">
-    <span class="section-kicker">Fai da te</span>
-    <h2 id="builder-heading">Build your own</h2>
-    <p class="builder-intro">
-      Tap an ingredient to add it, tap again to take it off — or drag it onto the pizza if
-      you're feeling theatrical. Giovanni reserves the right to comment.
-    </p>
+    <span class="section-kicker">{T.builder.kicker}</span>
+    <h2 id="builder-heading">{T.builder.heading}</h2>
+    <p class="builder-intro">{T.builder.intro}</p>
 
     <div class="builder-grid">
       <div class="canvas-column">
@@ -258,7 +261,7 @@
         </div>
 
         <fieldset class="size-picker">
-          <legend>Size</legend>
+          <legend>{T.builder.sizeLegend}</legend>
           <div class="size-options">
             {#each sizes as option (option.id)}
               <label class="size-option">
@@ -280,7 +283,7 @@
           </p>
 
           {#if layers.length > 0}
-            <ul class="picked" role="list" aria-label="Toppings on your pizza — activate to remove">
+            <ul class="picked" role="list" aria-label={T.builder.pickedLabel}>
               {#each layers as ingredient (ingredient.slug)}
                 <li>
                   <button
@@ -290,9 +293,9 @@
                     transition:scale={{ duration: prefersReducedMotion() ? 0 : 180, start: 0.7 }}
                   >
                     <img src={ingredient.iconSrc} alt="" width="20" height="20" />
-                    {ingredient.name}
+                    {T.ingredients[ingredient.slug]}
                     <span class="picked-x" aria-hidden="true">×</span>
-                    <span class="sr-only"> — remove</span>
+                    <span class="sr-only">{T.builder.removeSr}</span>
                   </button>
                 </li>
               {/each}
@@ -301,7 +304,7 @@
 
           <div class="builder-actions">
             <button type="button" class="btn btn-primary" onclick={handleAddToOrder}>
-              Add to order
+              {T.builder.addToOrder}
             </button>
             <button
               type="button"
@@ -309,7 +312,7 @@
               onclick={surprise}
               disabled={surpriseBusy}
             >
-              Giovanni's choice
+              {T.builder.surprise}
             </button>
             <button
               type="button"
@@ -317,16 +320,16 @@
               onclick={startOver}
               disabled={selected.length === 0}
             >
-              Start over
+              {T.builder.startOver}
             </button>
           </div>
         </div>
       </div>
 
-      <div class="tray" aria-label="Ingredients">
+      <div class="tray" aria-label={T.builder.trayLabel}>
         {#each groupOrder as group (group)}
           <div class="tray-group">
-            <h3 class="tray-heading">{groupLabels[group]}</h3>
+            <h3 class="tray-heading">{T.groups[group]}</h3>
             <ul class="tray-list" role="list">
               {#each ingredients.filter((i) => i.group === group) as ingredient (ingredient.slug)}
                 {@const active = selected.includes(ingredient.slug)}
@@ -347,7 +350,7 @@
                       {/if}
                     </span>
                     <span class="tray-name">
-                      {ingredient.name}
+                      {T.ingredients[ingredient.slug]}
                       {#if ingredient.tags.includes('spicy')}
                         <svg class="tag-glyph" viewBox="0 0 16 16" width="13" height="13" aria-hidden="true"><path d="M11 2 Q13 2 13 4 Q13 5 12 5.5 Q13 10 8 13 Q3 15 2 11 Q6 12 8 9 Q10 6.5 10 5.5 Q9 5 9 4 Q9 2 11 2 Z" fill="#a82f16"/></svg>
                       {/if}
@@ -375,7 +378,7 @@
       bind:this={orderBarEl}
     >
       <button type="button" class="order-bar-pizza" onclick={scrollToPizza}>
-        <span class="sr-only">Scroll back to your pizza</span>
+        <span class="sr-only">{T.builder.scrollBack}</span>
         <img src={BASE_LAYER_SRC} alt="" width="46" height="46" loading="lazy" />
         {#each layers as layer (layer.slug)}
           <img src={layer.layerSrc} alt="" width="46" height="46" loading="lazy" />
@@ -383,11 +386,11 @@
       </button>
       <div class="order-bar-info">
         <span class="order-bar-name">{pizzaName}</span>
-        <span class="order-bar-meta">{size} · {selected.length} topping{selected.length === 1 ? '' : 's'}</span>
+        <span class="order-bar-meta">{T.builder.orderBarMeta(size, selected.length)}</span>
       </div>
       <span class="order-bar-price">{euro(price)}</span>
       <button type="button" class="btn btn-primary order-bar-add" onclick={handleAddToOrder}>
-        Add<span class="sr-only"> {pizzaName} to order</span>
+        {T.builder.add}<span class="sr-only">{T.builder.addSr(pizzaName)}</span>
       </button>
     </div>
   </div>

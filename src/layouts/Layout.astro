@@ -1,12 +1,10 @@
 ---
 import '../styles/global.css';
+import { getDict, locales, localePath, resolveLocale } from '../i18n';
 
-interface Props {
-  title: string;
-  description: string;
-}
-
-const { title, description } = Astro.props;
+const locale = resolveLocale(Astro.currentLocale);
+const t = getDict(locale);
+const { title, description } = t.meta;
 
 // Restaurant schema for search engines and AI assistants; the numbers match
 // the hours in the footer and the rating shown in the hero/reviews.
@@ -36,7 +34,7 @@ const schema = {
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang={locale}>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
@@ -47,6 +45,10 @@ const schema = {
     <meta property="og:type" content="website" />
     <meta name="theme-color" content="#b93425" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    {locales.map((l) => (
+      <link rel="alternate" hreflang={l} href={localePath(l)} />
+    ))}
+    <link rel="alternate" hreflang="x-default" href="/" />
     <link rel="preload" href="/fonts/anton.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="preload" href="/fonts/archivo.woff2" as="font" type="font/woff2" crossorigin />
     <link
@@ -60,7 +62,7 @@ const schema = {
     <script is:inline type="application/ld+json" set:html={JSON.stringify(schema)} />
   </head>
   <body>
-    <a href="#main" class="skip-link">Skip to content</a>
+    <a href="#main" class="skip-link">{t.skipLink}</a>
     <slot />
     <!-- Single polite live region; everything announces through src/lib/announce.ts -->
     <div id="sr-status" role="status" aria-live="polite" class="sr-only"></div>

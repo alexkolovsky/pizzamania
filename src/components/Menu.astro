@@ -4,34 +4,34 @@
 import { pizzas, pizzaPrice } from '../data/pizzas';
 import { BASE_LAYER_SRC, ingredientBySlug } from '../data/ingredients';
 import { euro } from '../lib/format';
+import { getDict } from '../i18n';
+
+const t = getDict(Astro.currentLocale);
 ---
 
 <section id="menu" class="section menu-section" aria-labelledby="menu-heading">
   <span class="ghost-word" aria-hidden="true">Le Pizze</span>
   <div class="container">
-    <span class="section-kicker">Le nostre pizze</span>
-    <h2 id="menu-heading">The house five</h2>
-    <p class="menu-intro">
-      Five pizzas we will defend with our lives. Add one straight to your order, or hit
-      &ldquo;Customize&rdquo; and make it yours — Giovanni is watching, but he can't stop you.
-    </p>
+    <span class="section-kicker">{t.menu.kicker}</span>
+    <h2 id="menu-heading">{t.menu.heading}</h2>
+    <p class="menu-intro">{t.menu.intro}</p>
 
     <ul class="menu-grid" role="list">
       {pizzas.map((pizza, index) => {
         const toppings = pizza.ingredientSlugs
           .map((slug) => ingredientBySlug.get(slug)!)
           .sort((a, b) => a.z - b.z);
-        const names = toppings.map((t) => t.name).join(', ');
+        const names = toppings.map((topping) => t.ingredients[topping.slug]).join(', ');
         // Base is tomato + mozzarella, so "vegetarian" hinges on the toppings
         const isVegetarian = toppings.every(
-          (t) => t.tags.includes('vegetarian') || t.tags.includes('vegan'),
+          (topping) => topping.tags.includes('vegetarian') || topping.tags.includes('vegan'),
         );
-        const isSpicy = toppings.some((t) => t.tags.includes('spicy'));
+        const isSpicy = toppings.some((topping) => topping.tags.includes('spicy'));
         return (
           <li class="menu-card">
             <div class="menu-visual" aria-hidden="true">
               <span class="menu-number">N°{index + 1}</span>
-              {index === 0 && <span class="menu-pick">Giovanni's pick ♥</span>}
+              {index === 0 && <span class="menu-pick">{t.menu.pick}</span>}
               <div class="menu-pizza">
                 <img src={BASE_LAYER_SRC} alt="" width="512" height="512" loading="lazy" />
                 {toppings.map((t) => (
@@ -43,35 +43,35 @@ import { euro } from '../lib/format';
               <p class="menu-title-row">
                 <span class="menu-name">
                   {pizza.name}
-                  {index === 0 && <span class="sr-only"> — Giovanni's pick</span>}
+                  {index === 0 && <span class="sr-only">{t.menu.pickSr}</span>}
                 </span>
                 <span class="menu-dots" aria-hidden="true"></span>
                 <span class="menu-price">{euro(pizzaPrice(pizza.ingredientSlugs))}</span>
               </p>
-              <p class="menu-desc">{pizza.description}</p>
-              <p class="menu-ingredients">Tomato, mozzarella, {names.toLowerCase()}</p>
+              <p class="menu-desc">{t.menu.descriptions[pizza.id]}</p>
+              <p class="menu-ingredients">{t.menu.ingredientsLine(names.toLowerCase())}</p>
               {(isVegetarian || isSpicy) && (
                 <p class="menu-tags">
                   {isVegetarian && (
                     <span class="menu-tag menu-tag-veg">
                       <svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true"><path d="M13 3 Q13 11 6 13 Q3 13 3 10 Q3 5 13 3 Z M6 13 Q8 8 12 5" fill="#3a5a2e" stroke="#f6eedf" stroke-width="0.8"/></svg>
-                      Vegetariana
+                      {t.menu.vegetarian}
                     </span>
                   )}
                   {isSpicy && (
                     <span class="menu-tag menu-tag-spicy">
                       <svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true"><path d="M11 2 Q13 2 13 4 Q13 5 12 5.5 Q13 10 8 13 Q3 15 2 11 Q6 12 8 9 Q10 6.5 10 5.5 Q9 5 9 4 Q9 2 11 2 Z" fill="#a82f16"/></svg>
-                      Piccante
+                      {t.menu.spicy}
                     </span>
                   )}
                 </p>
               )}
               <div class="menu-actions">
                 <button type="button" class="btn btn-primary" data-add-pizza={pizza.id}>
-                  Add to order<span class="sr-only">: {pizza.name}</span>
+                  {t.menu.add}<span class="sr-only">{t.menu.addSr(pizza.name)}</span>
                 </button>
                 <button type="button" class="btn btn-secondary" data-customize-pizza={pizza.id}>
-                  Customize<span class="sr-only"> {pizza.name} in the builder</span>
+                  {t.menu.customize}<span class="sr-only">{t.menu.customizeSr(pizza.name)}</span>
                 </button>
               </div>
             </div>

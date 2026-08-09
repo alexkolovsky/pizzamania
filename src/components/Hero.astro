@@ -3,6 +3,9 @@
 // layers composited with absolutely-positioned images. Floating garnish
 // around it reuses the builder tray icons.
 import { BASE_LAYER_SRC, ingredientBySlug } from '../data/ingredients';
+import { getDict } from '../i18n';
+
+const t = getDict(Astro.currentLocale);
 
 const heroToppings = ['pomodorini', 'basilico'].map((slug) => ingredientBySlug.get(slug)!);
 
@@ -25,32 +28,29 @@ const garnish = [
 <section id="top" class="hero" aria-labelledby="hero-heading">
   <div class="container hero-grid">
     <div class="hero-copy">
-      <p class="hero-eyebrow">Pizzeria napoletana &middot; Vico della Mozzarella 17</p>
+      <p class="hero-eyebrow">{t.hero.eyebrow}</p>
       <!-- Kinetic reveal: each beat rises in sequence; static under reduced motion -->
       <h1 id="hero-heading">
-        <span class="beat" style="--beat: 0">Fire.</span>
-        <span class="beat" style="--beat: 1">Flour.</span>
-        <em class="beat hero-accent" style="--beat: 2">Amore.</em>
+        <span class="beat" style="--beat: 0">{t.hero.beat1}</span>
+        <span class="beat" style="--beat: 1">{t.hero.beat2}</span>
+        <em class="beat hero-accent" style="--beat: 2">{t.hero.beat3}</em>
       </h1>
-      <p class="hero-sub">
-        Ninety seconds in a wood-fired oven, a 48-hour dough, and a chef named Giovanni with
-        very strong opinions. Build your own — he'll only interfere a little.
-      </p>
+      <p class="hero-sub">{t.hero.sub}</p>
       <div class="hero-actions">
-        <a href="#builder" class="btn btn-primary hero-cta">Build your pizza</a>
-        <a href="#menu" class="hero-menu-link">or trust the menu ↓</a>
+        <a href="#builder" class="btn btn-primary hero-cta">{t.hero.cta}</a>
+        <a href="#menu" class="hero-menu-link">{t.hero.menuLink}</a>
       </div>
 
       <!-- Social proof beside the CTA: the classic rating-near-the-ask pattern -->
       <p class="hero-proof">
         <span class="hero-stars" aria-hidden="true">★★★★★</span>
-        <span class="sr-only">Rated 4.9 out of 5.</span>
-        <strong>4.9</strong> — from 812 Neapolitans with opinions
+        <span class="sr-only">{t.hero.ratedSr}</span>
+        <strong>4.9</strong> {t.hero.proof}
       </p>
     </div>
 
     <div class="hero-visual" id="hero-visual">
-      <div class="hero-pizza" role="img" aria-label="A margherita pizza with cherry tomatoes and fresh basil, gently steaming">
+      <div class="hero-pizza" role="img" aria-label={t.hero.pizzaLabel}>
         <img src={BASE_LAYER_SRC} alt="" width="512" height="512" fetchpriority="high" />
         {heroToppings.map((topping) => (
           <img class="hero-layer" src={topping.layerSrc} alt="" width="512" height="512" style={`z-index:${topping.z}`} />

@@ -1,0 +1,32 @@
+---
+// Shared page body for every locale — the /it/ and /uk/ routes render this
+// exact tree; components pick their language from Astro.currentLocale.
+import Layout from '../layouts/Layout.astro';
+import Nav from './Nav.astro';
+import Hero from './Hero.astro';
+import Menu from './Menu.astro';
+import StatsBand from './StatsBand.astro';
+import Reviews from './Reviews.astro';
+import Story from './Story.astro';
+import Footer from './Footer.astro';
+import OrderApp from './order/OrderApp.svelte';
+import { resolveLocale } from '../i18n';
+
+const locale = resolveLocale(Astro.currentLocale);
+---
+
+<Layout>
+  <Nav />
+  <main id="main">
+    <Hero />
+    <Menu />
+    <StatsBand />
+    <!-- client:load — the cart panel must react to the nav button immediately.
+         The locale prop keeps the island's server-rendered HTML in the page
+         language; on the client the runtime re-reads <html lang>. -->
+    <OrderApp client:load {locale} />
+    <Reviews />
+    <Story />
+  </main>
+  <Footer />
+</Layout>

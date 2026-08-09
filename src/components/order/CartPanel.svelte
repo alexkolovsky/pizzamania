@@ -14,10 +14,15 @@
     recipeSummary,
   } from '../../stores/cart';
   import { pizzaPrice, sizeById } from '../../data/pizzas';
-  import { euro, euroSpoken } from '../../lib/format';
+  import { euro } from '../../lib/format';
   import { announce } from '../../lib/announce';
   import { focusTrap } from '../../lib/focusTrap';
   import { prefersReducedMotion } from '../../lib/motion';
+  import { t } from '../../i18n/runtime';
+
+  // Locale is fixed per page (switching languages navigates), so one
+  // snapshot at component init is safe on both server and client.
+  const T = t();
 
   type Stage = 'cart' | 'checkout' | 'success';
 
@@ -25,23 +30,24 @@
 
   /* Countries the fictional Vespa fleet is willing to reach. Italy first
      (home turf), the rest alphabetical. `dial` only feeds the phone
-     placeholder — numbers are validated permissively either way. */
+     placeholder — numbers are validated permissively either way.
+     Names come from the dictionary so they follow the page language. */
   const countries = [
-    { code: 'IT', name: 'Italy', dial: '+39' },
-    { code: 'AT', name: 'Austria', dial: '+43' },
-    { code: 'BE', name: 'Belgium', dial: '+32' },
-    { code: 'FR', name: 'France', dial: '+33' },
-    { code: 'DE', name: 'Germany', dial: '+49' },
-    { code: 'NL', name: 'Netherlands', dial: '+31' },
-    { code: 'PT', name: 'Portugal', dial: '+351' },
-    { code: 'SI', name: 'Slovenia', dial: '+386' },
-    { code: 'ES', name: 'Spain', dial: '+34' },
-    { code: 'CH', name: 'Switzerland', dial: '+41' },
+    { code: 'IT', dial: '+39' },
+    { code: 'AT', dial: '+43' },
+    { code: 'BE', dial: '+32' },
+    { code: 'FR', dial: '+33' },
+    { code: 'DE', dial: '+49' },
+    { code: 'NL', dial: '+31' },
+    { code: 'PT', dial: '+351' },
+    { code: 'SI', dial: '+386' },
+    { code: 'ES', dial: '+34' },
+    { code: 'CH', dial: '+41' },
   ] as const;
 
-  type FieldId = 'name' | 'phone' | 'street' | 'postal' | 'city';
+  type FieldId = 'name' | 'phone' | 'street' | 'city';
 
-  const blankForm = { name: '', phone: '', country: 'IT', street: '', postal: '', city: '' };
+  const blankForm = { name: '', phone: '', country: 'IT', street: '', city: '' };
   let form = $state({ ...blankForm });
   let errors = $state<Partial<Record<FieldId, string>>>({});
   let orderedName = $state('');
@@ -116,31 +122,28 @@
   function validate(): boolean {
     const next: typeof errors = {};
     if (form.name.trim().length < 2) {
-      next.name = 'Please tell us your name (at least 2 letters).';
+      next.name = T.cart.errors.name;
     }
     // Permissive on purpose: spaces, dashes, dots and parens are fine,
     // we only insist on something dialable underneath
     const dialable = form.phone.replace(/[\s\-().]/g, '');
     if (!/^\+?\d{6,15}$/.test(dialable)) {
-      next.phone = 'Please add a phone number — the courier calls when the Vespa arrives.';
+      next.phone = T.cart.errors.phone;
     }
     if (form.street.trim().length < 4) {
-      next.street = 'Please give us a street and number — Vespas need directions.';
-    }
-    if (!/^[A-Za-z0-9][A-Za-z0-9 -]{1,9}$/.test(form.postal.trim())) {
-      next.postal = 'That postal code looks off.';
+      next.street = T.cart.errors.street;
     }
     if (form.city.trim().length < 2) {
-      next.city = 'Which city are we riding to?';
+      next.city = T.cart.errors.city;
     }
     errors = next;
     // Focus follows DOM order so the fix-up flow reads top to bottom
-    const first = (['name', 'phone', 'street', 'postal', 'city'] as FieldId[]).find(
+    const first = (['name', 'phone', 'street', 'city'] as FieldId[]).find(
       (field) => next[field],
     );
     if (first) {
       document.getElementById(`order-${first}`)?.focus();
-      announce(`Form error: ${next[first]}`);
+      announce(T.cart.formError(next[first]!));
       return false;
     }
     return true;
@@ -153,9 +156,7 @@
     orderedPlace = `${form.street.trim()}, ${form.city.trim()}`;
     orderedTotal = $orderTotal;
     stage = 'success';
-    announce(
-      `Order placed for ${orderedName}. Total ${euroSpoken(orderedTotal)}. Grazie! Your pizza is in the fictional oven.`,
-    );
+    announce(T.cart.orderPlaced(orderedName, T.euroSpoken(orderedTotal)));
     clearCart();
     // Details stay in the form (and in storage) so the next order is prefilled
     try {
@@ -184,9 +185,9 @@
   >
     <header class="panel-header">
       <h2 id="cart-title">
-        {#if stage === 'cart'}Your order{:else if stage === 'checkout'}Checkout{:else}Grazie mille!{/if}
+        {#if stage === 'cart'}{T.cart.title}{:else if stage === 'checkout'}{T.cart.checkoutTitle}{:else}{T.cart.successTitle}{/if}
       </h2>
-      <button type="button" class="close-button" onclick={close} aria-label="Close order panel">
+      <button type="button" class="close-button" onclick={close} aria-label={T.cart.close}>
         <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true">
           <path d="M5 5 L19 19 M19 5 L5 19" />
         </svg>
@@ -196,9 +197,9 @@
     {#if stage === 'cart'}
       {#if $cartItems.length === 0}
         <div class="empty">
-          <p class="empty-lead">Your order is empty.</p>
-          <p>The oven is hot, the chef is pacing. Don't leave them hanging.</p>
-          <button type="button" class="btn btn-primary" onclick={close}>Browse the menu</button>
+          <p class="empty-lead">{T.cart.emptyLead}</p>
+          <p>{T.cart.emptyBody}</p>
+          <button type="button" class="btn btn-primary" onclick={close}>{T.cart.browse}</button>
         </div>
       {:else}
         <ul class="items" role="list">
@@ -207,25 +208,25 @@
               <div class="item-info">
                 <p class="item-name">
                   {item.name}
-                  <span class="item-size">{sizeById.get(item.size)?.label} · {sizeById.get(item.size)?.cm} cm</span>
+                  <span class="item-size">{T.sizes[item.size]} · {sizeById.get(item.size)?.cm} cm</span>
                 </p>
                 <p class="item-recipe">{recipeSummary(item.ingredientSlugs)}</p>
               </div>
               <div class="item-controls">
-                <div class="qty" aria-label="Quantity">
+                <div class="qty" aria-label={T.cart.qty}>
                   <button
                     type="button"
                     class="qty-button"
                     onclick={() => setQty(item.id, item.qty - 1)}
-                    aria-label="Decrease quantity of {item.name}"
+                    aria-label={T.cart.decrease(item.name)}
                   >−</button>
                   <span class="qty-count" aria-hidden="true">{item.qty}</span>
-                  <span class="sr-only">{item.qty} in order</span>
+                  <span class="sr-only">{T.cart.inOrder(item.qty)}</span>
                   <button
                     type="button"
                     class="qty-button"
                     onclick={() => setQty(item.id, item.qty + 1)}
-                    aria-label="Increase quantity of {item.name}"
+                    aria-label={T.cart.increase(item.name)}
                   >+</button>
                 </div>
                 <p class="item-price">{euro(itemPrice(item.ingredientSlugs, item.size) * item.qty)}</p>
@@ -234,7 +235,7 @@
                   class="remove-button"
                   onclick={() => removeFromCart(item.id)}
                 >
-                  Remove<span class="sr-only"> {item.name} from order</span>
+                  {T.cart.remove}<span class="sr-only">{T.cart.removeSr(item.name)}</span>
                 </button>
               </div>
             </li>
@@ -243,27 +244,25 @@
         <footer class="panel-footer">
           <dl class="summary">
             <div class="summary-row">
-              <dt>Subtotal</dt>
+              <dt>{T.cart.subtotal}</dt>
               <dd>{euro($cartTotal)}</dd>
             </div>
             <div class="summary-row">
-              <dt>Delivery</dt>
+              <dt>{T.cart.delivery}</dt>
               <dd>
-                {#if $deliveryFee === 0}<span class="summary-free">Free</span>{:else}{euro($deliveryFee)}{/if}
+                {#if $deliveryFee === 0}<span class="summary-free">{T.cart.free}</span>{:else}{euro($deliveryFee)}{/if}
               </dd>
             </div>
             <div class="summary-row summary-total">
-              <dt>Total</dt>
+              <dt>{T.cart.total}</dt>
               <dd>{euro($orderTotal)}</dd>
             </div>
           </dl>
           {#if $deliveryFee > 0}
-            <p class="free-nudge">
-              Add {euro(FREE_DELIVERY_MIN - $cartTotal)} more and delivery is on the house.
-            </p>
+            <p class="free-nudge">{T.cart.nudge(euro(FREE_DELIVERY_MIN - $cartTotal))}</p>
           {/if}
           <button type="button" class="btn btn-primary checkout-button" onclick={() => (stage = 'checkout')}>
-            Go to checkout
+            {T.cart.goCheckout}
           </button>
         </footer>
       {/if}
@@ -271,29 +270,24 @@
       <form class="checkout" onsubmit={submitOrder} novalidate>
         <dl class="summary checkout-summary">
           <div class="summary-row">
-            <dt>
-              {$cartItems.reduce((n, i) => n + i.qty, 0)}
-              pizza{$cartItems.reduce((n, i) => n + i.qty, 0) === 1 ? '' : 's'}
-            </dt>
+            <dt>{T.cart.pizzasCount($cartItems.reduce((n, i) => n + i.qty, 0))}</dt>
             <dd>{euro($cartTotal)}</dd>
           </div>
           <div class="summary-row">
-            <dt>Delivery</dt>
+            <dt>{T.cart.delivery}</dt>
             <dd>
-              {#if $deliveryFee === 0}<span class="summary-free">Free</span>{:else}{euro($deliveryFee)}{/if}
+              {#if $deliveryFee === 0}<span class="summary-free">{T.cart.free}</span>{:else}{euro($deliveryFee)}{/if}
             </dd>
           </div>
           <div class="summary-row summary-total">
-            <dt>Total</dt>
+            <dt>{T.cart.total}</dt>
             <dd>{euro($orderTotal)}</dd>
           </div>
         </dl>
-        <p class="checkout-note">
-          Cash on delivery, smiles included. Vespa ETA: 30–45 minutes.
-        </p>
+        <p class="checkout-note">{T.cart.note}</p>
 
         <div class="field">
-          <label for="order-name">Your name</label>
+          <label for="order-name">{T.cart.nameLabel}</label>
           <input
             id="order-name"
             type="text"
@@ -309,7 +303,7 @@
         </div>
 
         <div class="field">
-          <label for="order-phone">Phone</label>
+          <label for="order-phone">{T.cart.phoneLabel}</label>
           <input
             id="order-phone"
             type="tel"
@@ -326,16 +320,16 @@
         </div>
 
         <div class="field">
-          <label for="order-country">Country</label>
+          <label for="order-country">{T.cart.countryLabel}</label>
           <select id="order-country" autocomplete="country" bind:value={form.country}>
             {#each countries as country (country.code)}
-              <option value={country.code}>{country.name}</option>
+              <option value={country.code}>{T.cart.countries[country.code]}</option>
             {/each}
           </select>
         </div>
 
         <div class="field">
-          <label for="order-street">Street and number</label>
+          <label for="order-street">{T.cart.streetLabel}</label>
           <input
             id="order-street"
             type="text"
@@ -349,42 +343,25 @@
           {/if}
         </div>
 
-        <div class="field-row">
-          <div class="field field-postal">
-            <label for="order-postal">Postal code</label>
-            <input
-              id="order-postal"
-              type="text"
-              autocomplete="postal-code"
-              bind:value={form.postal}
-              aria-invalid={errors.postal ? 'true' : undefined}
-              aria-describedby={errors.postal ? 'order-postal-error' : undefined}
-            />
-          </div>
-          <div class="field field-city">
-            <label for="order-city">City</label>
-            <input
-              id="order-city"
-              type="text"
-              autocomplete="address-level2"
-              bind:value={form.city}
-              aria-invalid={errors.city ? 'true' : undefined}
-              aria-describedby={errors.city ? 'order-city-error' : undefined}
-            />
-          </div>
+        <div class="field">
+          <label for="order-city">{T.cart.cityLabel}</label>
+          <input
+            id="order-city"
+            type="text"
+            autocomplete="address-level2"
+            bind:value={form.city}
+            aria-invalid={errors.city ? 'true' : undefined}
+            aria-describedby={errors.city ? 'order-city-error' : undefined}
+          />
+          {#if errors.city}
+            <p class="field-error" id="order-city-error">{errors.city}</p>
+          {/if}
         </div>
-        <!-- Row errors live below the row so the two inputs stay aligned -->
-        {#if errors.postal}
-          <p class="field-error row-error" id="order-postal-error">{errors.postal}</p>
-        {/if}
-        {#if errors.city}
-          <p class="field-error row-error" id="order-city-error">{errors.city}</p>
-        {/if}
 
         <div class="checkout-actions">
           <div class="dodge-zone">
             {#if showSurrender}
-              <span class="surrender" aria-hidden="true">Va bene, va bene…</span>
+              <span class="surrender" aria-hidden="true">{T.cart.surrender}</span>
             {/if}
             <button
               type="submit"
@@ -392,11 +369,11 @@
               bind:this={orderButton}
               onpointerenter={handleOrderPointerEnter}
             >
-              Place order
+              {T.cart.placeOrder}
             </button>
           </div>
           <button type="button" class="btn btn-secondary" onclick={() => (stage = 'cart')}>
-            Back to order
+            {T.cart.back}
           </button>
         </div>
       </form>
@@ -406,14 +383,10 @@
           <img src="/pizza/base.svg" alt="" width="160" height="160" />
           <div class="success-steam"><span></span><span></span><span></span></div>
         </div>
-        <p class="success-lead">Grazie, {orderedName}!</p>
-        <p>
-          Your pizza is in the (entirely fictional) wood-fired oven. A courier on a Vespa is
-          already arguing with traffic on the way to {orderedPlace}. We'll call before ringing.
-          Estimated delivery: one daydream.
-        </p>
-        <p class="success-total">Have {euro(orderedTotal)} ready — cash on delivery.</p>
-        <button type="button" class="btn btn-primary" onclick={close}>Perfetto</button>
+        <p class="success-lead">{T.cart.successLead(orderedName)}</p>
+        <p>{T.cart.successBody(orderedPlace)}</p>
+        <p class="success-total">{T.cart.successTotal(euro(orderedTotal))}</p>
+        <button type="button" class="btn btn-primary" onclick={close}>{T.cart.perfetto}</button>
       </div>
     {/if}
   </div>
@@ -718,22 +691,6 @@
     font-size: var(--text-sm);
     font-weight: 700;
     color: var(--tomato-ink);
-  }
-
-  .field-row {
-    display: flex;
-    gap: var(--space-2);
-  }
-  .field-postal {
-    flex: 0 0 8.5rem;
-  }
-  .field-city {
-    flex: 1;
-    min-width: 0;
-  }
-  /* Snug the row's errors up against it despite the form grid's gap */
-  .row-error {
-    margin-top: calc(-1 * var(--space-2));
   }
 
   .checkout-actions {
