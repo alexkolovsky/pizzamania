@@ -78,7 +78,8 @@ export const en = {
     starsSr: (stars: number) => `Rated ${stars} out of 5 stars.`,
     quotes: [
       {
-        quote: 'The margherita made me call my nonna to apologize. For what? Everything.',
+        quote:
+          "I'm from Napoli. We don't compliment other people's pizza. I'm only writing this because it's true.",
         name: 'Lucia R.',
         place: 'Napoli',
         stars: 5,

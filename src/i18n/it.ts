@@ -75,7 +75,8 @@ export const it: Dict = {
     starsSr: (stars: number) => `Valutazione ${stars} su 5 stelle.`,
     quotes: [
       {
-        quote: 'La margherita mi ha fatto chiamare mia nonna per chiederle scusa. Di cosa? Di tutto.',
+        quote:
+          'Sono di Napoli. Noi non facciamo i complimenti alla pizza degli altri. Scrivo solo perché è vero.',
         name: 'Lucia R.',
         place: 'Napoli',
         stars: 5,
