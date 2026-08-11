@@ -20,11 +20,14 @@ export const uk: Dict = {
     title: 'Pizza Mania — неаполітанська піца з дровʼяної печі, зібрана по-твоєму',
     description:
       'Неаполітанська піцерія з конструктором власної піци, пʼятьма фірмовими класиками та шефом, який має дуже тверду думку про ананаси.',
+    ogImageAlt:
+      'Постер Pizza Mania: піца маргарита поряд зі словами "Fire. Flour. Amore." та оцінкою 4,9 зірки.',
   },
 
   skipLink: 'Перейти до вмісту',
 
   nav: {
+    mainLabel: 'Головна',
     menu: 'Меню',
     builder: 'Конструктор',
     story: 'Історія',
@@ -270,6 +273,7 @@ export const uk: Dict = {
     successTotal: (total: string) => `Приготуй ${total} — оплата готівкою при отриманні.`,
     perfetto: 'Perfetto',
     formError: (msg: string) => `Помилка у формі: ${msg}`,
+    formErrorCount: (n: number) => `Полів із помилками: ${n}. Починаємо з першого.`,
     orderPlaced: (name: string, total: string) =>
       `Замовлення для ${name} прийнято. Разом ${total}. Grazie! Твоя піца у вигаданій печі.`,
     errors: {

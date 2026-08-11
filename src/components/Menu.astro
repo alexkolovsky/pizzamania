@@ -12,7 +12,7 @@ const t = getDict(Astro.currentLocale);
 <section id="menu" class="section menu-section" aria-labelledby="menu-heading">
   <span class="ghost-word" aria-hidden="true">Le Pizze</span>
   <div class="container">
-    <span class="section-kicker">{t.menu.kicker}</span>
+    <span class="section-kicker" lang="it">{t.menu.kicker}</span>
     <h2 id="menu-heading">{t.menu.heading}</h2>
     <p class="menu-intro">{t.menu.intro}</p>
 
@@ -34,20 +34,20 @@ const t = getDict(Astro.currentLocale);
               {index === 0 && <span class="menu-pick">{t.menu.pick}</span>}
               <div class="menu-pizza">
                 <img src={BASE_LAYER_SRC} alt="" width="512" height="512" loading="lazy" />
-                {toppings.map((t) => (
-                  <img src={t.layerSrc} alt="" width="512" height="512" loading="lazy" style={`z-index:${t.z}`} />
+                {toppings.map((topping) => (
+                  <img src={topping.layerSrc} alt="" width="512" height="512" loading="lazy" style={`z-index:${topping.z}`} />
                 ))}
               </div>
             </div>
             <div class="menu-body">
-              <p class="menu-title-row">
-                <span class="menu-name">
+              <div class="menu-title-row">
+                <h3 class="menu-name">
                   {pizza.name}
                   {index === 0 && <span class="sr-only">{t.menu.pickSr}</span>}
-                </span>
+                </h3>
                 <span class="menu-dots" aria-hidden="true"></span>
                 <span class="menu-price">{euro(pizzaPrice(pizza.ingredientSlugs))}</span>
-              </p>
+              </div>
               <p class="menu-desc">{t.menu.descriptions[pizza.id]}</p>
               <p class="menu-ingredients">{t.menu.ingredientsLine(names.toLowerCase())}</p>
               {(isVegetarian || isSpicy) && (
@@ -229,9 +229,11 @@ const t = getDict(Astro.currentLocale);
   }
   .menu-name {
     font-family: var(--font-display);
+    font-weight: 400;
     text-transform: uppercase;
     font-size: var(--text-xl);
     line-height: 1.05;
+    margin: 0;
   }
   .menu-dots {
     flex: 1;

@@ -8,11 +8,14 @@ export const it: Dict = {
     title: 'Pizza Mania — pizza napoletana cotta a legna, fatta a modo tuo',
     description:
       "Pizzeria napoletana con un laboratorio per comporre la tua pizza, cinque classici della casa e uno chef con opinioni molto decise sull'ananas.",
+    ogImageAlt:
+      'Poster di Pizza Mania: una margherita accanto alle parole "Fire. Flour. Amore." e una valutazione di 4,9 stelle.',
   },
 
   skipLink: 'Salta al contenuto',
 
   nav: {
+    mainLabel: 'Principale',
     menu: 'Menù',
     builder: 'Laboratorio',
     story: 'Storia',
@@ -263,6 +266,7 @@ export const it: Dict = {
     successTotal: (total: string) => `Tieni pronti ${total} — pagamento alla consegna.`,
     perfetto: 'Perfetto',
     formError: (msg: string) => `Errore nel modulo: ${msg}`,
+    formErrorCount: (n: number) => `${n} campi da controllare. Partiamo dal primo.`,
     orderPlaced: (name: string, total: string) =>
       `Ordine effettuato per ${name}. Totale ${total}. Grazie! La tua pizza è nel forno immaginario.`,
     errors: {

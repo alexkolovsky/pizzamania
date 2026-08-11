@@ -55,13 +55,6 @@ export const ingredientBySlug: ReadonlyMap<string, Ingredient> = new Map(
   ingredients.map((i) => [i.slug, i]),
 );
 
-export const groupLabels: Record<IngredientGroup, string> = {
-  meat: 'Meats',
-  veg: 'Vegetables',
-  cheese: 'Cheeses',
-  extra: 'Extras',
-};
-
 export const groupOrder: IngredientGroup[] = ['meat', 'veg', 'cheese', 'extra'];
 
 /** Base pizza (crust, San Marzano sauce, fior di latte) — price in cents at size M. */

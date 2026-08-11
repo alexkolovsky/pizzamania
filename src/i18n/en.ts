@@ -11,11 +11,14 @@ export const en = {
     title: 'Pizza Mania — wood-fired Neapolitan pizza, built your way',
     description:
       'Neapolitan pizzeria with a build-your-own pizza workshop, five house classics, and a chef with very strong opinions about pineapple.',
+    ogImageAlt:
+      'Pizza Mania poster: a margherita pizza beside the words "Fire. Flour. Amore." and a 4.9-star rating.',
   },
 
   skipLink: 'Skip to content',
 
   nav: {
+    mainLabel: 'Main',
     menu: 'Menu',
     builder: 'Builder',
     story: 'Story',
@@ -259,6 +262,7 @@ export const en = {
     successTotal: (total: string) => `Have ${total} ready — cash on delivery.`,
     perfetto: 'Perfetto',
     formError: (msg: string) => `Form error: ${msg}`,
+    formErrorCount: (n: number) => `${n} fields need attention. Starting with the first one.`,
     orderPlaced: (name: string, total: string) =>
       `Order placed for ${name}. Total ${total}. Grazie! Your pizza is in the fictional oven.`,
     errors: {

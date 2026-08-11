@@ -4,7 +4,16 @@ import { getDict, locales, localePath, resolveLocale } from '../i18n';
 
 const locale = resolveLocale(Astro.currentLocale);
 const t = getDict(locale);
-const { title, description } = t.meta;
+const { title = t.meta.title, description = t.meta.description } = Astro.props as {
+  title?: string;
+  description?: string;
+};
+
+// hreflang/canonical/og:url need fully-qualified URLs. They resolve against
+// `site` in astro.config.mjs; until that's set we fall back to relative
+// hrefs (and skip canonical/og:url, which are meaningless relative).
+const abs = (path: string) => (Astro.site ? new URL(path, Astro.site).href : path);
+const ogLocales: Record<string, string> = { en: 'en_US', it: 'it_IT', uk: 'uk_UA' };
 
 // Restaurant schema for search engines and AI assistants; the numbers match
 // the hours in the footer and the rating shown in the hero/reviews.
@@ -43,12 +52,23 @@ const schema = {
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:type" content="website" />
+    <meta property="og:locale" content={ogLocales[locale]} />
+    {locales
+      .filter((l) => l !== locale)
+      .map((l) => <meta property="og:locale:alternate" content={ogLocales[l]} />)}
+    {Astro.site && <meta property="og:url" content={abs(Astro.url.pathname)} />}
+    {Astro.site && <link rel="canonical" href={abs(Astro.url.pathname)} />}
+    <meta property="og:image" content={abs('/og.png')} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content={t.meta.ogImageAlt} />
+    <meta name="twitter:card" content="summary_large_image" />
     <meta name="theme-color" content="#b93425" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     {locales.map((l) => (
-      <link rel="alternate" hreflang={l} href={localePath(l)} />
+      <link rel="alternate" hreflang={l} href={abs(localePath(l))} />
     ))}
-    <link rel="alternate" hreflang="x-default" href="/" />
+    <link rel="alternate" hreflang="x-default" href={abs('/')} />
     <link rel="preload" href="/fonts/anton.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="preload" href="/fonts/archivo.woff2" as="font" type="font/woff2" crossorigin />
     <link

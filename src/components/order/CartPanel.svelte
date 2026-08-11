@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { tick } from 'svelte';
   import { fade, fly } from 'svelte/transition';
   import {
     cartItems,
@@ -56,6 +57,16 @@
   let orderedTotal = $state(0);
 
   let orderButton: HTMLButtonElement | undefined = $state();
+  let panelTitle: HTMLHeadingElement | undefined = $state();
+
+  /* Swapping stages replaces the button that was just clicked, which would
+     drop keyboard focus to <body>. Re-anchor on the panel heading so the
+     new stage is announced and Tab continues from the top of the panel. */
+  async function setStage(next: Stage) {
+    stage = next;
+    await tick();
+    panelTitle?.focus();
+  }
 
   const dialHint = $derived(countries.find((c) => c.code === form.country)?.dial ?? '+39');
 
@@ -84,10 +95,6 @@
     if (stage === 'success') stage = 'cart';
     dodgeCount = 0;
     showSurrender = false;
-  }
-
-  function itemPrice(slugs: string[], size: Parameters<typeof pizzaPrice>[1]): number {
-    return pizzaPrice(slugs, size);
   }
 
   /* ---- The dodging order button ----------------------------------------
@@ -142,9 +149,14 @@
     const first = (['name', 'phone', 'street', 'city'] as FieldId[]).find(
       (field) => next[field],
     );
+    const errorCount = Object.keys(next).length;
     if (first) {
       document.getElementById(`order-${first}`)?.focus();
-      announce(T.cart.formError(next[first]!));
+      // Focus lands on the first bad field (its error reads via describedby);
+      // the live region carries the overall count so the rest aren't a surprise
+      announce(
+        errorCount > 1 ? T.cart.formErrorCount(errorCount) : T.cart.formError(next[first]!),
+      );
       return false;
     }
     return true;
@@ -156,7 +168,7 @@
     orderedName = form.name.trim();
     orderedPlace = `${form.street.trim()}, ${form.city.trim()}`;
     orderedTotal = $orderTotal;
-    stage = 'success';
+    void setStage('success');
     announce(T.cart.orderPlaced(orderedName, T.euroSpoken(orderedTotal)));
     clearCart();
     // Details stay in the form (and in storage) so the next order is prefilled
@@ -169,6 +181,8 @@
 </script>
 
 {#if $isCartOpen}
+  <!-- Pointer-only dismiss target; keyboard users close via Escape or the
+       labelled close button, so the div needs no key handler or role -->
   <div
     class="overlay"
     onclick={close}
@@ -181,11 +195,11 @@
     role="dialog"
     aria-modal="true"
     aria-labelledby="cart-title"
-    use:focusTrap={{ onEscape: close }}
+    use:focusTrap={{ onEscape: close, fallbackFocus: '.cart-button' }}
     transition:fly={{ x: 440, duration: motionDuration() }}
   >
     <header class="panel-header">
-      <h2 id="cart-title">
+      <h2 id="cart-title" tabindex="-1" bind:this={panelTitle}>
         {#if stage === 'cart'}{T.cart.title}{:else if stage === 'checkout'}{T.cart.checkoutTitle}{:else}{T.cart.successTitle}{/if}
       </h2>
       <button type="button" class="close-button" onclick={close} aria-label={T.cart.close}>
@@ -214,7 +228,7 @@
                 <p class="item-recipe">{recipeSummary(item.ingredientSlugs)}</p>
               </div>
               <div class="item-controls">
-                <div class="qty" aria-label={T.cart.qty}>
+                <div class="qty" role="group" aria-label={T.cart.qty}>
                   <button
                     type="button"
                     class="qty-button"
@@ -230,7 +244,7 @@
                     aria-label={T.cart.increase(item.name)}
                   >+</button>
                 </div>
-                <p class="item-price">{euro(itemPrice(item.ingredientSlugs, item.size) * item.qty)}</p>
+                <p class="item-price">{euro(pizzaPrice(item.ingredientSlugs, item.size) * item.qty)}</p>
                 <button
                   type="button"
                   class="remove-button"
@@ -262,7 +276,7 @@
           {#if $deliveryFee > 0}
             <p class="free-nudge">{T.cart.nudge(euro(FREE_DELIVERY_MIN - $cartTotal))}</p>
           {/if}
-          <button type="button" class="btn btn-primary checkout-button" onclick={() => (stage = 'checkout')}>
+          <button type="button" class="btn btn-primary checkout-button" onclick={() => setStage('checkout')}>
             {T.cart.goCheckout}
           </button>
         </footer>
@@ -293,6 +307,8 @@
             id="order-name"
             type="text"
             autocomplete="name"
+            required
+            aria-required="true"
             bind:value={form.name}
             aria-invalid={errors.name ? 'true' : undefined}
             aria-describedby={errors.name ? 'order-name-error' : undefined}
@@ -310,6 +326,8 @@
             type="tel"
             inputmode="tel"
             autocomplete="tel"
+            required
+            aria-required="true"
             placeholder="{dialHint} 333 123 4567"
             bind:value={form.phone}
             aria-invalid={errors.phone ? 'true' : undefined}
@@ -335,6 +353,8 @@
             id="order-street"
             type="text"
             autocomplete="address-line1"
+            required
+            aria-required="true"
             bind:value={form.street}
             aria-invalid={errors.street ? 'true' : undefined}
             aria-describedby={errors.street ? 'order-street-error' : undefined}
@@ -350,6 +370,8 @@
             id="order-city"
             type="text"
             autocomplete="address-level2"
+            required
+            aria-required="true"
             bind:value={form.city}
             aria-invalid={errors.city ? 'true' : undefined}
             aria-describedby={errors.city ? 'order-city-error' : undefined}
@@ -373,7 +395,7 @@
               {T.cart.placeOrder}
             </button>
           </div>
-          <button type="button" class="btn btn-secondary" onclick={() => (stage = 'cart')}>
+          <button type="button" class="btn btn-secondary" onclick={() => setStage('cart')}>
             {T.cart.back}
           </button>
         </div>
@@ -665,8 +687,9 @@
     color: var(--ink);
   }
   .field input::placeholder {
+    /* opacity would composite below 4.5:1 on cream — keep the full token */
     color: var(--ink-soft);
-    opacity: 0.65;
+    opacity: 1;
   }
   .field select {
     appearance: none;
@@ -685,7 +708,7 @@
   }
   .field input[aria-invalid='true'] {
     border-color: var(--tomato);
-    background: #fdeee9;
+    background: var(--paper-error);
   }
   .field-error {
     margin: 0;

@@ -21,7 +21,7 @@ const t = getDict(current);
       href={localePath(locale)}
       lang={locale}
       hreflang={locale}
-      aria-current={locale === current ? 'true' : undefined}
+      aria-current={locale === current ? 'page' : undefined}
       title={dictionaries[locale].langName}
     >
       {localeShortLabels[locale]}
@@ -59,7 +59,7 @@ const t = getDict(current);
   .lang-switch a:hover {
     background: var(--paper-deep);
   }
-  .lang-switch a[aria-current='true'] {
+  .lang-switch a[aria-current='page'] {
     background: var(--tomato);
     color: var(--cream);
     /* pressed-in, like the size chips in the builder */
@@ -68,5 +68,9 @@ const t = getDict(current);
   .lang-switch a:focus-visible {
     outline: 3px solid var(--tomato);
     outline-offset: -3px;
+  }
+  /* tomato-on-tomato would vanish on the active chip */
+  .lang-switch a[aria-current='page']:focus-visible {
+    outline-color: var(--ink);
   }
 </style>

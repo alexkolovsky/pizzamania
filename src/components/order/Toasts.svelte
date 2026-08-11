@@ -43,6 +43,13 @@
     width: min(27rem, calc(100vw - 2rem));
     pointer-events: none;
   }
+  /* Below the builder's stacking breakpoint the sticky order bar owns the
+     bottom edge — hover the toasts above it instead of on top of it */
+  @media (max-width: 55.99em) {
+    .toast-stack {
+      bottom: calc(76px + var(--space-3) + env(safe-area-inset-bottom));
+    }
+  }
 
   .toast {
     display: flex;

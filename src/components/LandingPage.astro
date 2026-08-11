@@ -17,7 +17,8 @@ const locale = resolveLocale(Astro.currentLocale);
 
 <Layout>
   <Nav />
-  <main id="main">
+  <!-- tabindex so the skip link reliably moves focus (Safari) -->
+  <main id="main" tabindex="-1">
     <Hero />
     <Menu />
     <StatsBand />

@@ -28,7 +28,7 @@ const garnish = [
 <section id="top" class="hero" aria-labelledby="hero-heading">
   <div class="container hero-grid">
     <div class="hero-copy">
-      <p class="hero-eyebrow">{t.hero.eyebrow}</p>
+      <p class="hero-eyebrow" lang="it">{t.hero.eyebrow}</p>
       <!-- Kinetic reveal: each beat rises in sequence; static under reduced motion -->
       <h1 id="hero-heading">
         <span class="beat" style="--beat: 0">{t.hero.beat1}</span>
@@ -210,7 +210,7 @@ const garnish = [
     color: var(--ink-soft);
   }
   .hero-stars {
-    color: var(--mustard);
+    color: var(--mustard-deep);
     letter-spacing: 0.1em;
     margin-right: 0.35em;
     text-shadow: 1px 1px 0 var(--ink);
@@ -369,6 +369,11 @@ const garnish = [
     .marquee-track {
       animation: marquee 24s linear infinite;
       will-change: transform;
+    }
+    /* WCAG 2.2.2: moving content needs a way to pause it */
+    .marquee:hover .marquee-track,
+    .marquee:focus-within .marquee-track {
+      animation-play-state: paused;
     }
     @keyframes marquee {
       to {

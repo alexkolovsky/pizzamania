@@ -91,7 +91,10 @@
   --basil: #3a5a2e;
   --basil-dark: #263e1d;
   --mustard: #e3a63b;
+  --mustard-deep: #b07708; /* gold that holds 3:1 on paper/cream — stars, small accents */
   --cream: #fff9ec;
+  --paper-error: #fdeee9; /* invalid-field background */
+  --ink-faint: #beb4a5; /* fine print on ink */
 
   --font-display: 'Anton', 'Arial Narrow', 'Helvetica Neue', sans-serif;
   --font-serif: 'Instrument Serif', 'Iowan Old Style', Georgia, serif;
@@ -294,4 +297,10 @@ a {
 }
 .skip-link:focus {
   transform: translateY(0);
+}
+
+/* Skip-link target: focusable for reliable focus movement, but a focus
+   ring around the entire page content would be noise */
+main:focus {
+  outline: none;
 }

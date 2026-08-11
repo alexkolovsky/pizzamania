@@ -12,7 +12,7 @@ const t = getDict(Astro.currentLocale);
 ---
 
 <header class="site-header">
-  <nav class="container nav" id="site-nav" aria-label="Main">
+  <nav class="container nav" id="site-nav" aria-label={t.nav.mainLabel}>
     <a href="#top" class="logo">
       <svg class="logo-mark" viewBox="0 0 64 64" width="30" height="30" aria-hidden="true">
         <path d="M32 6 L58 54 Q32 66 6 54 Z" fill="#e3a63b" stroke="#211a12" stroke-width="3" stroke-linejoin="round"/>
@@ -48,7 +48,7 @@ const t = getDict(Astro.currentLocale);
 
     <div class="lang-desktop"><LangSwitch /></div>
 
-    <button type="button" class="cart-button" id="nav-cart-button" aria-haspopup="dialog">
+    <button type="button" class="cart-button" id="nav-cart-button" aria-haspopup="dialog" aria-expanded="false">
       <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
         <circle cx="9" cy="21" r="1.5"></circle>
         <circle cx="18" cy="21" r="1.5"></circle>
@@ -82,6 +82,7 @@ const t = getDict(Astro.currentLocale);
   });
 
   button.addEventListener('click', () => isCartOpen.set(true));
+  isCartOpen.subscribe((open) => button.setAttribute('aria-expanded', String(open)));
 
   /* ---- Mobile disclosure menu ---- */
   const nav = document.getElementById('site-nav')!;

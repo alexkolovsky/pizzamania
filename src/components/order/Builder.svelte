@@ -28,9 +28,23 @@
      (sessionStorage) so he doesn't reset to outrage on every visit. */
   const GIOVANNI_COUNT_KEY = 'pizzamania-giovanni-count';
 
+  // Guarded like the delivery form's localStorage: blocked storage
+  // (lockdown mode, some private windows) must not break the builder.
   function pineappleProtests(): number {
-    const n = Number(sessionStorage.getItem(GIOVANNI_COUNT_KEY));
-    return Number.isFinite(n) && n > 0 ? n : 0;
+    try {
+      const n = Number(sessionStorage.getItem(GIOVANNI_COUNT_KEY));
+      return Number.isFinite(n) && n > 0 ? n : 0;
+    } catch {
+      return 0;
+    }
+  }
+
+  function recordProtest(count: number) {
+    try {
+      sessionStorage.setItem(GIOVANNI_COUNT_KEY, String(count));
+    } catch {
+      /* Giovanni forgets between reloads — the scene still plays */
+    }
   }
 
   let selected = $state<string[]>([]);
@@ -108,7 +122,7 @@
     // the other in the shared live region.
     if (slug === 'ananas') {
       const protests = pineappleProtests();
-      sessionStorage.setItem(GIOVANNI_COUNT_KEY, String(protests + 1));
+      recordProtest(protests + 1);
       if (protests === 0) {
         if (prefersReducedMotion()) {
           showToast(T.builder.pineappleToast);
@@ -142,10 +156,10 @@
 
   function removeIngredient(slug: string) {
     const ingredient = ingredientBySlug.get(slug);
+    if (!ingredient) return;
     selected = selected.filter((s) => s !== slug);
     pulseBar();
     if (selected.length < 10) lasagnaWarned = false;
-    if (!ingredient) return;
 
     // Taking the pineapple off earns visible relief — while he still cares.
     // Once he's resigned (3+ protests), he no longer reacts to anything.
@@ -160,6 +174,7 @@
   }
 
   function toggle(slug: string) {
+    cancelSurprise(); // manual picks take over from a running "surprise me"
     if (selected.includes(slug)) {
       removeIngredient(slug);
     } else {
@@ -192,6 +207,7 @@
   }
 
   function startOver() {
+    cancelSurprise(); // otherwise queued surprise toppings land on the cleared pizza
     selected = [];
     lasagnaWarned = false;
     announce(T.builder.cleared);
@@ -232,30 +248,49 @@
   /* "Giovanni's choice": clears the pizza and deals 3–5 random toppings one
      by one so the layers rain in sequence. Never pineapple — he'd never. */
   let surpriseBusy = $state(false);
+  let surpriseTimers: ReturnType<typeof setTimeout>[] = [];
+
+  function cancelSurprise() {
+    for (const timer of surpriseTimers) clearTimeout(timer);
+    surpriseTimers = [];
+    surpriseBusy = false;
+  }
+
+  function shuffle<T>(items: T[]): T[] {
+    // Fisher–Yates; sort(() => random - 0.5) is biased
+    const out = [...items];
+    for (let i = out.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [out[i], out[j]] = [out[j]!, out[i]!];
+    }
+    return out;
+  }
 
   function surprise() {
     if (surpriseBusy) return;
     surpriseBusy = true;
     const pool = ingredients.filter((i) => i.slug !== 'ananas').map((i) => i.slug);
     const count = 3 + Math.floor(Math.random() * 3);
-    const picks = [...pool].sort(() => Math.random() - 0.5).slice(0, count);
+    const picks = shuffle(pool).slice(0, count);
     const step = prefersReducedMotion() ? 0 : 280;
 
     selected = [];
     lasagnaWarned = false;
     announce(T.builder.choosing);
     picks.forEach((slug, i) => {
-      setTimeout(() => {
-        selected = [...selected, slug];
-        pulseCanvas();
-        if (i === picks.length - 1) {
-          surpriseBusy = false;
-          announce(
-            T.builder.chosen(recipeSummary(selected), T.euroSpoken(priceAfter(selected))),
-          );
-          showToast(T.builder.fidatiToast);
-        }
-      }, 150 + i * step);
+      surpriseTimers.push(
+        setTimeout(() => {
+          selected = [...selected, slug];
+          pulseCanvas();
+          if (i === picks.length - 1) {
+            cancelSurprise();
+            announce(
+              T.builder.chosen(recipeSummary(selected), T.euroSpoken(priceAfter(selected))),
+            );
+            showToast(T.builder.fidatiToast);
+          }
+        }, 150 + i * step),
+      );
     });
   }
 
@@ -269,7 +304,7 @@
 
 <section id="builder" class="section builder" aria-labelledby="builder-heading" tabindex="-1">
   <div class="container">
-    <span class="section-kicker">{T.builder.kicker}</span>
+    <span class="section-kicker" lang="it">{T.builder.kicker}</span>
     <h2 id="builder-heading">{T.builder.heading}</h2>
     <p class="builder-intro">{T.builder.intro}</p>
 
@@ -361,7 +396,7 @@
         </div>
       </div>
 
-      <div class="tray" aria-label={T.builder.trayLabel}>
+      <div class="tray" role="group" aria-label={T.builder.trayLabel}>
         {#each groupOrder as group (group)}
           <div class="tray-group">
             <h3 class="tray-heading">{T.groups[group]}</h3>
@@ -440,7 +475,9 @@
     background: var(--paper-deep);
     border-block: var(--border);
   }
-  .builder:focus {
+  /* Programmatic anchor for "Customize" — hide the ring for pointer users
+     but keep it for keyboard-driven focus */
+  .builder:focus:not(:focus-visible) {
     outline: none;
   }
 

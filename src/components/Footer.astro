@@ -26,10 +26,11 @@ const t = getDict(Astro.currentLocale);
     </div>
     <div>
       <h2 class="footer-heading">{t.footer.followHeading}</h2>
+      <!-- The pizzeria is fictional, so these aren't links pointing nowhere -->
       <ul class="footer-list" role="list">
-        <li><a href="#top">Instagram</a></li>
-        <li><a href="#top">Facebook</a></li>
-        <li><a href="#top">TikTok</a></li>
+        <li>Instagram · @pizzamania.napoli</li>
+        <li>Facebook · Pizza Mania Napoli</li>
+        <li>TikTok · @pizzamania</li>
       </ul>
     </div>
   </div>
@@ -102,7 +103,7 @@ const t = getDict(Astro.currentLocale);
     border-top: 1px solid var(--ink-soft);
     padding-top: var(--space-3);
     font-size: var(--text-sm);
-    color: #beb4a5;
+    color: var(--ink-faint);
   }
   .footer-fine p {
     margin: 0;

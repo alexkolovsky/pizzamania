@@ -1,0 +1,89 @@
+---
+// Static 404 in the same poster style. One page for all locales (a lost URL
+// has no locale), so the copy carries all three languages home.
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout title="404 — Pizza Mania" description="This page slid off the peel.">
+  <main id="main" tabindex="-1" class="lost">
+    <p class="lost-code" aria-hidden="true">404</p>
+    <h1>This page slid off the peel.</h1>
+    <p class="lost-body">
+      Whatever you were looking for isn't in the oven. The pizza, however, is.
+    </p>
+    <p class="lost-links">
+      <a class="btn-home" href="/">Back to the pizzeria</a>
+      <a href="/it/" lang="it">Torna alla pizzeria</a>
+      <a href="/uk/" lang="uk">Назад до піцерії</a>
+    </p>
+  </main>
+</Layout>
+
+<style>
+  .lost {
+    min-height: 100svh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    gap: var(--space-3);
+    padding: var(--space-4);
+    background: var(--paper);
+  }
+  .lost:focus {
+    outline: none;
+  }
+  .lost-code {
+    font-family: var(--font-display);
+    font-size: var(--text-hero);
+    line-height: 1;
+    color: var(--tomato);
+    text-shadow: 4px 4px 0 var(--ink);
+    margin: 0;
+  }
+  .lost h1 {
+    font-family: var(--font-display);
+    text-transform: uppercase;
+    font-size: var(--text-xl);
+    margin: 0;
+  }
+  .lost-body {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-size: var(--text-lg);
+    color: var(--ink-soft);
+    margin: 0;
+  }
+  .lost-links {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-3);
+    margin: var(--space-2) 0 0;
+  }
+  .lost-links a {
+    color: var(--ink);
+    font-weight: 700;
+    text-underline-offset: 3px;
+  }
+  .lost-links .btn-home {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    padding: 0 1.2rem;
+    background: var(--tomato);
+    color: var(--cream);
+    text-decoration: none;
+    text-transform: uppercase;
+    font-size: var(--text-sm);
+    letter-spacing: 0.06em;
+    border: var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-hard-sm);
+  }
+  .lost-links .btn-home:hover {
+    background: var(--tomato-dark);
+  }
+</style>
