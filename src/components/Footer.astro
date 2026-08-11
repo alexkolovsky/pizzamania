@@ -35,6 +35,9 @@ const t = getDict(Astro.currentLocale);
   </div>
   <div class="container footer-fine">
     <p>{t.footer.fine}</p>
+    <p class="footer-hire">
+      {t.footer.hire} <a href="mailto:hi@kolovsky.dev">hi@kolovsky.dev</a>
+    </p>
   </div>
 </footer>
 
@@ -103,5 +106,15 @@ const t = getDict(Astro.currentLocale);
   }
   .footer-fine p {
     margin: 0;
+  }
+
+  .footer-hire {
+    margin-top: var(--space-1);
+  }
+  .footer-hire a {
+    color: var(--mustard);
+  }
+  .footer-hire a:hover {
+    color: var(--paper);
   }
 </style>

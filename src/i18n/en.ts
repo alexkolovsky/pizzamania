@@ -128,6 +128,7 @@ export const en = {
     findHeading: 'Find us',
     followHeading: 'Follow',
     fine: '© 2026 Pizza Mania. A fictional pizzeria for the dev.to Perfect Landing challenge. No pizzas were harmed.',
+    hire: 'Want a website like this? Write to',
   },
 
   ingredients: {

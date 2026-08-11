@@ -125,6 +125,7 @@ export const it: Dict = {
     findHeading: 'Dove siamo',
     followHeading: 'Seguici',
     fine: '© 2026 Pizza Mania. Una pizzeria immaginaria per la challenge Perfect Landing di dev.to. Nessuna pizza è stata maltrattata.',
+    hire: 'Vuoi un sito così? Scrivi a',
   },
 
   ingredients: {

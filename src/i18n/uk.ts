@@ -136,6 +136,7 @@ export const uk: Dict = {
     findHeading: 'Як нас знайти',
     followHeading: 'Стежте за нами',
     fine: '© 2026 Pizza Mania. Вигадана піцерія для челенджу Perfect Landing на dev.to. Жодна піца не постраждала.',
+    hire: 'Хочете такий самий сайт? Пишіть на',
   },
 
   ingredients: {
