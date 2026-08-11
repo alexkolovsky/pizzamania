@@ -43,6 +43,7 @@
     { code: 'SI', dial: '+386' },
     { code: 'ES', dial: '+34' },
     { code: 'CH', dial: '+41' },
+    { code: 'UA', dial: '+380' },
   ] as const;
 
   type FieldId = 'name' | 'phone' | 'street' | 'city';

@@ -270,6 +270,7 @@ export const it: Dict = {
       SI: 'Slovenia',
       ES: 'Spagna',
       CH: 'Svizzera',
+      UA: 'Ucraina',
     },
     addedToOrder: (name: string, total: string) =>
       `${name} aggiunta all'ordine. Totale ordine ${total}.`,

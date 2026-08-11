@@ -266,6 +266,7 @@ export const en = {
       SI: 'Slovenia',
       ES: 'Spain',
       CH: 'Switzerland',
+      UA: 'Ukraine',
     } as Record<string, string>,
     addedToOrder: (name: string, total: string) =>
       `${name} added to order. Order total ${total}.`,

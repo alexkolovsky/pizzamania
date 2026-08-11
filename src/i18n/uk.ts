@@ -278,6 +278,7 @@ export const uk: Dict = {
       SI: 'Словенія',
       ES: 'Іспанія',
       CH: 'Швейцарія',
+      UA: 'Україна',
     },
     addedToOrder: (name: string, total: string) =>
       `${name} — додано в замовлення. Разом ${total}.`,
