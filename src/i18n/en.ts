@@ -75,23 +75,33 @@ export const en = {
     heading: 'Word on the vicolo',
     ratedSr: 'Rated 4.9 out of 5.',
     aggregate: 'from 812 orders that arrived warm.',
-    fiveStarsSr: 'Five stars.',
+    starsSr: (stars: number) => `Rated ${stars} out of 5 stars.`,
     quotes: [
       {
         quote: 'The margherita made me call my nonna to apologize. For what? Everything.',
         name: 'Lucia R.',
         place: 'Napoli',
+        stars: 5,
       },
       {
         quote:
           'I ordered pineapple. Giovanni allowed it. I felt judged, fed and forgiven — in that order.',
         name: 'Marek D.',
         place: 'Wien',
+        stars: 5,
       },
       {
         quote: '48-hour dough, 90-second bake, gone in 40 seconds. The math checks out.',
         name: 'Sofia T.',
         place: 'Milano',
+        stars: 5,
+      },
+      {
+        quote:
+          'The diavola reached Kyiv hot and angry, exactly as promised. Fifth star arrives when they open a branch on my street.',
+        name: 'Oksana K.',
+        place: 'Kyiv',
+        stars: 4,
       },
     ],
   },

@@ -72,23 +72,33 @@ export const it: Dict = {
     heading: 'Voce di vicolo',
     ratedSr: 'Valutazione 4,9 su 5.',
     aggregate: 'da 812 ordini arrivati caldi.',
-    fiveStarsSr: 'Cinque stelle.',
+    starsSr: (stars: number) => `Valutazione ${stars} su 5 stelle.`,
     quotes: [
       {
         quote: 'La margherita mi ha fatto chiamare mia nonna per chiederle scusa. Di cosa? Di tutto.',
         name: 'Lucia R.',
         place: 'Napoli',
+        stars: 5,
       },
       {
         quote:
           "Ho ordinato l'ananas. Giovanni l'ha permesso. Mi sono sentito giudicato, sfamato e perdonato — in quest'ordine.",
         name: 'Marek D.',
         place: 'Vienna',
+        stars: 5,
       },
       {
         quote: 'Impasto di 48 ore, cottura di 90 secondi, sparita in 40. I conti tornano.',
         name: 'Sofia T.',
         place: 'Milano',
+        stars: 5,
+      },
+      {
+        quote:
+          'La diavola è arrivata a Kyiv calda e arrabbiata, come promesso. La quinta stella arriva quando aprono una sede nella mia via.',
+        name: 'Oksana K.',
+        place: 'Kyiv',
+        stars: 4,
       },
     ],
   },

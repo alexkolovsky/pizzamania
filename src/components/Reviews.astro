@@ -1,9 +1,16 @@
 ---
-// Social proof between the builder and the story: three short reviews and
-// an aggregate line. Static copy, same trattoria art direction as the menu.
+// Social proof between the builder and the story: short reviews and an
+// aggregate line. Static copy, same trattoria art direction as the menu.
 import { getDict } from '../i18n';
 
 const t = getDict(Astro.currentLocale);
+
+const initials = (name: string) =>
+  name
+    .split(' ')
+    .map((part) => part.replace(/[^\p{L}]/gu, '').charAt(0))
+    .join('')
+    .toUpperCase();
 ---
 
 <section class="section reviews" aria-labelledby="reviews-heading">
@@ -19,13 +26,18 @@ const t = getDict(Astro.currentLocale);
     <ul class="reviews-grid" role="list">
       {t.reviews.quotes.map((review) => (
         <li class="review-card">
-          <p class="review-stars" aria-hidden="true">★★★★★</p>
-          <span class="sr-only">{t.reviews.fiveStarsSr}</span>
+          <p class="review-stars" aria-hidden="true">
+            <span>{'★'.repeat(review.stars)}</span><span class="review-stars-empty">{'☆'.repeat(5 - review.stars)}</span>
+          </p>
+          <span class="sr-only">{t.reviews.starsSr(review.stars)}</span>
           <blockquote class="review-quote">
             <p>&ldquo;{review.quote}&rdquo;</p>
           </blockquote>
           <p class="review-byline">
-            {review.name} <span class="review-place">· {review.place}</span>
+            <span class="review-avatar" aria-hidden="true">{initials(review.name)}</span>
+            <span class="review-who">
+              {review.name} <span class="review-place">· {review.place}</span>
+            </span>
           </p>
         </li>
       ))}
@@ -73,12 +85,27 @@ const t = getDict(Astro.currentLocale);
     box-shadow: var(--shadow-hard);
     padding: var(--space-4);
     transform: rotate(-0.6deg);
+    transition: transform 160ms ease;
   }
   .review-card:nth-child(2) {
     transform: rotate(0.7deg);
   }
   .review-card:nth-child(3) {
     transform: rotate(-0.4deg);
+  }
+  .review-card:nth-child(4) {
+    transform: rotate(0.5deg);
+  }
+  .review-card:hover {
+    transform: rotate(0deg) translateY(-2px);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .review-card {
+      transition: none;
+    }
+    .review-card:hover {
+      transform: none;
+    }
   }
 
   .review-stars {
@@ -99,13 +126,38 @@ const t = getDict(Astro.currentLocale);
   }
 
   .review-byline {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
     font-weight: 700;
     font-size: var(--text-sm);
     text-transform: uppercase;
     letter-spacing: 0.06em;
     margin: 0;
   }
+  .review-avatar {
+    flex-shrink: 0;
+    display: grid;
+    place-items: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: 50%;
+    border: var(--border);
+    background: var(--mustard);
+    color: var(--ink);
+    font-size: 0.8rem;
+    letter-spacing: 0.02em;
+    box-shadow: 1px 1px 0 var(--ink);
+  }
+  .review-card:nth-child(even) .review-avatar {
+    background: var(--tomato);
+    color: var(--cream);
+  }
   .review-place {
     color: var(--ink-soft);
+  }
+  .review-stars-empty {
+    color: var(--ink-soft);
+    text-shadow: none;
   }
 </style>
